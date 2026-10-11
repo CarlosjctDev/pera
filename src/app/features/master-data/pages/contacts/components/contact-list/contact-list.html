@@ -1,0 +1,138 @@
+<app-data-table
+  [rows]="contactsForKind()"
+  [columns]="columns()"
+  [loading]="loading()"
+  [editTemplate]="editRow() ?? null"
+  [isRowEditing]="isEditing"
+  [emptyLabel]="'contacts.empty'"
+/>
+
+<ng-template #nameCell let-contact>
+  <div class="flex min-w-0 items-center gap-2">
+    <span
+      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-app-secondary text-app-secondary-fg"
+      aria-hidden="true"
+    >
+      <app-icon [name]="kindIcon(contact.isCompany ? 'company' : 'person')" class="h-3.5 w-3.5" />
+    </span>
+    <span class="truncate text-sm font-medium">{{ contact.name }}</span>
+  </div>
+</ng-template>
+
+<ng-template #kindCell let-contact>
+  <span class="text-app-muted">
+    {{ kindLabel(contact.isCompany ? 'company' : 'person') | t }}
+  </span>
+</ng-template>
+
+<ng-template #genderCell let-contact>
+  @if (!contact.isCompany && genderLabel(contact.gender)) {
+    <span class="text-app-muted">{{ genderLabel(contact.gender) | t }}</span>
+  } @else {
+    <span class="text-app-muted">—</span>
+  }
+</ng-template>
+
+<ng-template #actionsCell let-contact>
+  <div class="flex items-center justify-end gap-1">
+    <button
+      type="button"
+      (click)="startEdit(contact)"
+      [tippy]="'common.edit' | t"
+      class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-app-secondary hover:text-app-fg"
+    >
+      <app-icon name="edit" class="h-4 w-4" />
+    </button>
+    <button
+      type="button"
+      (click)="confirmDelete(contact)"
+      [tippy]="isInUse(contact.id) ? ('contacts.inUse' | t) : ('common.delete' | t)"
+      [disabled]="isInUse(contact.id)"
+      class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-app-muted"
+    >
+      <app-icon name="trash" class="h-4 w-4" />
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #editCell let-contact>
+  <form class="min-w-0 flex-1 space-y-2" (ngSubmit)="saveEdit(contact)">
+    <div class="flex gap-2">
+      <button type="button" (click)="selectEditKind('person')" [class]="editKindClass('person')">
+        <app-icon name="user" class="h-3 w-3" />
+        <span>{{ 'contacts.kind.person' | t }}</span>
+      </button>
+      <button type="button" (click)="selectEditKind('company')" [class]="editKindClass('company')">
+        <app-icon name="users" class="h-3 w-3" />
+        <span>{{ 'contacts.kind.company' | t }}</span>
+      </button>
+    </div>
+
+    @if (editKind() === 'person') {
+      <div class="space-y-2">
+        <div class="flex flex-wrap gap-2">
+          @for (gender of genders; track gender) {
+            <button
+              type="button"
+              (click)="selectEditGender(gender)"
+              [class]="editGenderClass(gender)"
+            >
+              {{ genderLabel(gender) | t }}
+            </button>
+          }
+        </div>
+        @if (editGenderError()) {
+          <p class="text-xs text-red-500" role="alert">
+            {{ 'contacts.genderError' | t }}
+          </p>
+        }
+      </div>
+    }
+
+    <div class="flex items-center gap-2">
+      <input
+        type="text"
+        maxlength="60"
+        autocomplete="off"
+        name="edit-contact-name"
+        class="min-w-0 flex-1 rounded-lg bg-app-surface px-3 py-1.5 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+        [attr.aria-invalid]="editDuplicate()"
+        [ngModel]="editName()"
+        (ngModelChange)="editName.set($event); editDuplicate.set(false)"
+      />
+      <app-select
+        class="max-w-[10rem]"
+        name="edit-relationship-type"
+        size="sm"
+        [searchable]="false"
+        [options]="relationshipOptions()"
+        [placeholder]="'contacts.relationshipPlaceholder' | t"
+        [ngModel]="editRelationshipTypeId()"
+        (ngModelChange)="onEditRelationshipChange($event)"
+      />
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button
+        type="submit"
+        [tippy]="'common.save' | t"
+        class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg text-emerald-600 transition hover:bg-emerald-500/10 dark:text-emerald-400"
+      >
+        <app-icon name="check" class="h-4 w-4" />
+      </button>
+      <button
+        type="button"
+        (click)="cancelEdit()"
+        [tippy]="'common.cancel' | t"
+        class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-app-secondary hover:text-app-fg"
+      >
+        <app-icon name="close" class="h-4 w-4" />
+      </button>
+    </div>
+    @if (editDuplicate()) {
+      <p class="text-xs text-red-500" role="alert">
+        {{ 'contacts.errors.duplicate' | t }}
+      </p>
+    }
+  </form>
+</ng-template>

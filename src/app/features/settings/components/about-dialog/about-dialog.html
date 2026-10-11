@@ -1,0 +1,161 @@
+
+<app-dialog-shell
+  [title]="'settings.about.dialogTitle' | t"
+  [icon]="'info'"
+  [maxWidth]="'min(92vw, 32rem)'"
+>
+  <!-- Identidad de la aplicación -->
+  <div class="flex flex-col items-center px-2 py-4 text-center">
+    <div
+      class="mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-app-primary/10 ring-1 ring-inset ring-app-primary/20"
+    >
+      <img
+        src="icono.png"
+        [alt]="environment.appName"
+        class="h-14 w-14 object-contain"
+      />
+    </div>
+
+    <h2 class="text-2xl font-bold tracking-tight text-app-fg">
+      {{ environment.appName }}
+    </h2>
+
+    <span
+      class="mt-2 rounded-full bg-app-secondary px-3 py-1 text-xs font-medium text-app-muted ring-1 ring-inset ring-app-border"
+    >
+      {{ 'settings.about.version' | t }} {{ environment.appVersion }}
+    </span>
+
+    <p class="mt-5 max-w-sm text-sm leading-6 text-app-muted">
+      {{ 'settings.about.description' | t }}
+    </p>
+  </div>
+
+  <!-- Información de la aplicación -->
+  <div
+    class="mt-2 divide-y divide-app-border rounded-2xl border border-app-border"
+  >
+    <div class="flex items-center gap-3 p-4">
+      <div
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-app-secondary"
+      >
+        <app-icon
+          name="wallet"
+          class="h-5 w-5 text-app-primary"
+        />
+      </div>
+
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-semibold text-app-fg">
+          {{ 'settings.about.purposeTitle' | t }}
+        </p>
+
+        <p class="mt-1 text-xs leading-5 text-app-muted">
+          {{ 'settings.about.purposeDescription' | t }}
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 p-4">
+      <div
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-app-secondary"
+      >
+        <app-icon
+          name="database"
+          class="h-5 w-5 text-app-primary"
+        />
+      </div>
+
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-semibold text-app-fg">
+          {{ 'settings.about.privacyTitle' | t }}
+        </p>
+
+        <p class="mt-1 text-xs leading-5 text-app-muted">
+          {{ 'settings.about.privacyDescription' | t }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Perfiles del desarrollador -->
+  <div class="mt-5">
+    <p
+      class="mb-3 text-xs font-semibold uppercase tracking-wider text-app-muted"
+    >
+      {{ 'settings.about.developerTitle' | t }}
+    </p>
+
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <a
+        href="https://www.linkedin.com/in/cjctdev05"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex min-w-0 items-center gap-3 rounded-xl border border-app-border p-3 transition hover:bg-app-secondary focus-visible:ring-2 focus-visible:ring-app-primary focus-visible:outline-none"
+      >
+        <app-icon
+          name="linkedin"
+          class="h-5 w-5 shrink-0 text-app-primary"
+        />
+
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-semibold text-app-fg">
+            LinkedIn
+          </p>
+
+          <p class="text-xs text-app-muted">
+            {{ 'settings.about.linkedinDescription' | t }}
+          </p>
+        </div>
+
+        <app-icon
+          name="external-link"
+          class="h-4 w-4 shrink-0 text-app-muted"
+        />
+      </a>
+
+      <a
+        href="https://github.com/CarlosjctDev"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex min-w-0 items-center gap-3 rounded-xl border border-app-border p-3 transition hover:bg-app-secondary focus-visible:ring-2 focus-visible:ring-app-primary focus-visible:outline-none"
+      >
+        <app-icon
+          name="github"
+          class="h-5 w-5 shrink-0 text-app-primary"
+        />
+
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-semibold text-app-fg">
+            GitHub
+          </p>
+
+          <p class="text-xs text-app-muted">
+            {{ 'settings.about.githubDescription' | t }}
+          </p>
+        </div>
+
+        <app-icon
+          name="external-link"
+          class="h-4 w-4 shrink-0 text-app-muted"
+        />
+      </a>
+    </div>
+  </div>
+
+  <!-- Pie de diálogo -->
+  <div class="mt-6 flex flex-col items-center gap-4">
+    <p class="text-center text-xs text-app-muted">
+      © {{ currentYear }} {{ environment.appName }}.
+      {{ 'settings.about.rightsReserved' | t }}
+    </p>
+
+    <button
+      type="button"
+      (click)="close()"
+      class="w-full rounded-xl bg-app-secondary px-4 py-2.5 text-sm font-semibold text-app-secondary-fg ring-1 ring-inset ring-app-border transition hover:bg-app-secondary-hover hover:text-app-fg focus:ring-2 focus:ring-app-primary focus:outline-none"
+    >
+      {{ 'common.close' | t }}
+    </button>
+  </div>
+</app-dialog-shell>

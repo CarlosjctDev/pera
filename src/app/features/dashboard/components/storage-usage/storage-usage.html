@@ -1,0 +1,82 @@
+<section class="w-full rounded-2xl bg-app-surface p-4 shadow-sm ring-1 ring-app-border sm:p-5">
+  <div class="flex items-center gap-3">
+    <span
+      class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-app-secondary text-app-secondary-fg"
+      aria-hidden="true"
+    >
+      <app-icon name="database" class="h-5 w-5" />
+    </span>
+    <div class="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-2">
+      <h2 class="text-base font-semibold">{{ 'dashboard.storage.title' | t }}</h2>
+
+      @if (storage.supported()) {
+        <span
+          class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
+          [class]="
+            storage.persisted()
+              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+              : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+          "
+        >
+          @if (storage.persisted()) {
+            <app-icon name="check" class="h-3 w-3" />
+          }
+          {{
+            (storage.persisted() ? 'dashboard.storage.persisted' : 'dashboard.storage.notPersisted')
+              | t
+          }}
+        </span>
+      }
+    </div>
+  </div>
+
+  @if (storage.supported()) {
+    <div class="mt-4 space-y-3">
+      <div
+        class="h-2 overflow-hidden rounded-full bg-app-secondary"
+        role="progressbar"
+        [attr.aria-valuenow]="storage.usedPercent()"
+      >
+        <div
+          class="h-full rounded-full bg-app-primary transition-all"
+          [style.width.%]="storage.usedPercent()"
+        ></div>
+      </div>
+
+      <dl class="grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
+        <div>
+          <dt class="text-xs text-app-muted">{{ 'dashboard.storage.used' | t }}</dt>
+          <dd class="font-semibold tabular-nums">{{ storage.usage() | bytes }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-app-muted">{{ 'dashboard.storage.free' | t }}</dt>
+          <dd class="font-semibold tabular-nums">{{ storage.free() | bytes }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-app-muted">{{ 'dashboard.storage.total' | t }}</dt>
+          <dd class="font-semibold tabular-nums">{{ storage.quota() | bytes }}</dd>
+        </div>
+      </dl>
+
+      @if (storage.canPersist()) {
+        <button
+          type="button"
+          (click)="requestPersistence()"
+          class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-app-primary px-3 py-1.5 text-sm font-semibold text-app-primary-fg transition hover:bg-app-primary-hover active:bg-app-primary-active disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <app-icon name="security" class="h-4 w-4" />
+          {{ 'dashboard.storage.persistButton' | t }}
+        </button>
+      } @else {
+        <p class="mt-4 flex items-center gap-2 text-sm text-app-muted">
+          <app-icon name="security" class="h-4 w-4 shrink-0" />
+          {{ 'dashboard.storage.secureContextRequired' | t }}
+        </p>
+      }
+    </div>
+  } @else {
+    <p class="mt-4 text-sm text-app-muted">
+      {{ 'dashboard.storage.notSupported' | t }}
+    </p>
+  }
+</section>

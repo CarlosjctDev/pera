@@ -1,0 +1,76 @@
+<app-dialog-shell
+  [title]="'scheduled.title' | t"
+  [icon]="'activity-log'"
+  [maxWidth]="'min(94vw, 52rem)'"
+>
+  <app-data-table
+    [rows]="rows()"
+    [columns]="columns()"
+    [loading]="loading()"
+    [emptyLabel]="'scheduled.empty'"
+    [pageSizeOptions]="[5, 10, 15]"
+  />
+
+  <div class="mt-6 flex justify-end">
+    <button
+      type="button"
+      (click)="close()"
+      class="rounded-xl bg-app-secondary px-4 py-2.5 text-sm font-semibold text-app-secondary-fg ring-1 ring-inset ring-app-border transition hover:bg-app-secondary-hover hover:text-app-fg"
+    >
+      {{ 'common.close' | t }}
+    </button>
+  </div>
+
+  <ng-template #dateCell let-item>
+    <span class="flex items-center gap-2 whitespace-nowrap">
+      <span class="text-app-muted">{{ item.nextDate + 'T00:00:00' | i18nDate }}</span>
+      @if (!item.active) {
+        <span class="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
+          {{ 'scheduled.paused' | t }}
+        </span>
+      }
+    </span>
+  </ng-template>
+
+  <ng-template #typeCell let-item>
+    <div class="flex items-center gap-2">
+      <app-icon [name]="item.type" class="h-4 w-4 shrink-0" [class]="typeColor(item.type)" />
+      <span class="truncate text-sm">{{ typeLabel(item.type) | t }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template #amountCell let-item>
+    <span class="truncate text-sm font-semibold tabular-nums" [class]="typeColor(item.type)">
+      {{ item.amount | i18nCurrency: currency() }}
+    </span>
+  </ng-template>
+
+  <ng-template #recurrenceCell let-item>
+    @if (recurrenceFor(item); as label) {
+      <span class="truncate text-sm">{{ label.key | t: label.params }}</span>
+    } @else {
+      <span class="text-sm text-app-muted">{{ 'scheduled.oneOff' | t }}</span>
+    }
+  </ng-template>
+
+  <ng-template #actionsCell let-item>
+    <div class="flex items-center justify-end gap-2">
+      <button
+        type="button"
+        (click)="onToggle(item)"
+        [tippy]="(item.active ? 'scheduled.pause' : 'scheduled.resume') | t"
+        class="cursor-pointer rounded-lg bg-app-secondary px-2 py-1 text-xs font-semibold text-app-secondary-fg ring-1 ring-inset ring-app-border transition hover:bg-app-secondary-hover hover:text-app-fg"
+      >
+        {{ (item.active ? 'scheduled.pause' : 'scheduled.resume') | t }}
+      </button>
+      <button
+        type="button"
+        (click)="onConfirmDelete(item)"
+        [tippy]="'common.delete' | t"
+        class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-red-500/10 hover:text-red-500"
+      >
+        <app-icon name="trash" class="h-4 w-4" />
+      </button>
+    </div>
+  </ng-template>
+</app-dialog-shell>

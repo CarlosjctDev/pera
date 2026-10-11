@@ -1,0 +1,59 @@
+<header
+  class="relative z-30 flex h-16 shrink-0 items-center justify-between border-b border-app-border bg-app-surface/80 px-4 backdrop-blur"
+>
+  <div class="flex items-center gap-3">
+    @if (showSidebarToggle()) {
+      <button
+        type="button"
+        (click)="sidebarToggle.emit()"
+        [attr.aria-label]="'topbar.openMenu' | t"
+        class="rounded-xl bg-app-secondary p-2 text-app-secondary-fg ring-1 ring-inset ring-app-border transition hover:bg-app-secondary-hover lg:hidden"
+      >
+        <app-icon name="menu" class="h-5 w-5" />
+      </button>
+    }
+
+    <button
+      type="button"
+      (click)="home.emit()"
+      [attr.aria-label]="'nav.welcome' | t"
+      [tippy]="'nav.welcome' | t"
+      class="flex items-center gap-2.5 rounded-xl outline-none transition hover:opacity-90"
+    >
+      <div
+        class="flex h-9 w-9 items-center justify-center rounded-xl bg-app-primary text-app-primary-fg shadow-lg shadow-app-primary/30"
+      >
+        <img src="icono.png" alt="" class="h-5 w-5 object-contain" />
+      </div>
+      @if (showTitle()) {
+        <span class="hidden text-lg font-semibold tracking-tight text-app-fg sm:inline">{{
+          title()
+        }}</span>
+      }
+    </button>
+  </div>
+
+  <div class="flex items-center gap-2 sm:gap-3">
+    <app-theme [compact]="true" />
+
+    @for (action of actions(); track action.label) {
+      <button
+        type="button"
+        [attr.data-testid]="action.testId"
+        [attr.aria-label]="action.label"
+        (click)="actionClicked.emit(action)"
+        [tippy]="action.label"
+        [class]="actionClass(action.accent)"
+      >
+        <app-icon [name]="action.icon" class="h-5 w-5" />
+      </button>
+    }
+
+    <div
+      class="flex h-10 w-10 select-none items-center justify-center rounded-full bg-app-primary text-sm font-semibold text-app-primary-fg shadow-lg shadow-app-primary/30"
+      [tippy]="avatarTip()"
+    >
+      {{ initials() }}
+    </div>
+  </div>
+</header>

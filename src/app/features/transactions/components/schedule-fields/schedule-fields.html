@@ -1,0 +1,114 @@
+<div class="space-y-2 rounded-xl bg-app-secondary/40 p-3 ring-1 ring-inset ring-app-border">
+  <label class="flex cursor-pointer items-center justify-between gap-3 text-sm font-medium">
+    <span class="flex items-center gap-2">
+      <app-icon name="activity-log" class="h-4 w-4 text-app-muted" />
+      {{ enableLabelKey() | t }}
+    </span>
+    <input
+      name="schedule-enabled"
+      type="checkbox"
+      class="h-4 w-4 cursor-pointer accent-app-primary"
+      [ngModel]="enabled()"
+      (ngModelChange)="onEnabledChange($event)"
+    />
+  </label>
+
+  @if (enabled()) {
+    @if (dateHintKey(); as dateHint) {
+      <p class="text-xs text-app-muted">{{ dateHint | t }}</p>
+    }
+
+    <div class="space-y-3">
+      <div class="space-y-1">
+        <span class="block text-xs font-medium text-app-muted">
+          {{ 'accounts.recurrence.title' | t }}
+        </span>
+        <div class="flex flex-wrap gap-1.5">
+          @for (option of kinds; track option.value) {
+            <button
+              type="button"
+              [attr.aria-pressed]="kind() === option.value"
+              (click)="selectKind(option.value)"
+              class="flex h-9 cursor-pointer items-center justify-center rounded-xl px-3 text-xs font-semibold transition"
+              [class]="
+                kind() === option.value
+                  ? 'bg-app-primary text-app-primary-fg hover:bg-app-primary-hover'
+                  : 'bg-app-secondary/50 text-app-muted ring-1 ring-inset ring-app-border hover:bg-app-secondary'
+              "
+            >
+              {{ option.labelKey | t }}
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (kind() !== 'none') {
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="text-sm text-app-muted" for="schedule-recurrence-every">
+            {{ 'accounts.recurrence.everyLabel' | t }}
+          </label>
+          <input
+            id="schedule-recurrence-every"
+            name="schedule-recurrence-every"
+            type="number"
+            min="1"
+            step="1"
+            inputmode="numeric"
+            class="w-20 rounded-xl bg-app-secondary/50 px-3 py-2 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+            [ngModel]="every()"
+            (ngModelChange)="onEveryChange($event)"
+          />
+          <span class="text-sm text-app-muted">{{ unitsKey(kind()) | t }}</span>
+        </div>
+
+        @if (kind() === 'months') {
+          <div class="flex items-center gap-2">
+            <label class="text-sm text-app-muted" for="schedule-recurrence-day">
+              {{ 'accounts.recurrence.dayLabel' | t }}
+            </label>
+            <input
+              id="schedule-recurrence-day"
+              name="schedule-recurrence-day"
+              type="number"
+              min="1"
+              max="31"
+              step="1"
+              inputmode="numeric"
+              class="w-20 rounded-xl bg-app-secondary/50 px-3 py-2 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+              [ngModel]="dayOfMonth()"
+              (ngModelChange)="onDayChange($event)"
+            />
+            <span class="text-xs text-app-muted">{{ dayHintKey() | t }}</span>
+          </div>
+        }
+
+        <div class="space-y-1">
+          <span class="block text-xs font-medium text-app-muted">
+            {{ 'accounts.recurrence.omitLabel' | t }}
+          </span>
+          <div class="flex flex-wrap gap-1.5">
+            @for (weekday of weekdays; track weekday.value) {
+              <button
+                type="button"
+                [attr.aria-pressed]="isOmitted(weekday.value)"
+                (click)="toggleOmit(weekday.value)"
+                class="flex h-9 min-w-9 cursor-pointer items-center justify-center rounded-xl px-2.5 text-xs font-semibold transition"
+                [class]="
+                  isOmitted(weekday.value)
+                    ? 'bg-app-primary text-app-primary-fg hover:bg-app-primary-hover'
+                    : 'bg-app-secondary/50 text-app-muted ring-1 ring-inset ring-app-border hover:bg-app-secondary'
+                "
+              >
+                {{ weekday.labelKey | t }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (hintKey(); as hint) {
+      <p class="text-xs text-app-muted">{{ hint | t }}</p>
+    }
+  }
+</div>

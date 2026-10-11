@@ -1,0 +1,66 @@
+<app-dialog-shell [title]="'attachments.title' | t" icon="file">
+  <div class="space-y-4">
+    <div>
+      <input
+        #fileInput
+        hidden
+        type="file"
+        multiple
+        accept="application/pdf,image/*"
+        (change)="onFilesSelected($event)"
+      />
+      <button
+        type="button"
+        (click)="openPicker()"
+        [disabled]="saving()"
+        class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-app-primary px-3 py-2 text-sm font-semibold text-app-primary-fg transition hover:bg-app-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <app-icon name="paperclip" class="h-4 w-4" />
+        {{ (saving() ? 'common.loading' : 'attachments.addButton') | t }}
+      </button>
+      <p class="mt-1 text-xs text-app-muted">{{ 'attachments.addHint' | t }}</p>
+    </div>
+
+    @if (rows().length === 0) {
+      <p class="text-sm text-app-muted">{{ 'attachments.empty' | t }}</p>
+    } @else {
+      <ul class="space-y-1.5">
+        @for (attachment of rows(); track attachment.id) {
+          <li class="flex min-w-0 items-center gap-2 rounded-xl bg-app-secondary px-3 py-2">
+            <app-icon name="file" class="h-4 w-4 shrink-0 text-app-muted" />
+            <span class="min-w-0 flex-1 truncate text-sm">{{ attachment.name }}</span>
+            <span
+              class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide"
+              [class]="
+                isPdf(attachment.mimeType)
+                  ? 'bg-red-500/10 text-red-600 dark:text-red-400'
+                  : 'bg-sky-500/10 text-sky-600 dark:text-sky-400'
+              "
+            >
+              {{ (isPdf(attachment.mimeType) ? 'attachments.pdf' : 'attachments.image') | t }}
+            </span>
+            <span class="shrink-0 text-xs tabular-nums text-app-muted">
+              {{ attachment.size | bytes }}
+            </span>
+            <button
+              type="button"
+              (click)="view(attachment)"
+              [tippy]="'attachments.view' | t"
+              class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-app-primary/10 hover:text-app-primary"
+            >
+              <app-icon name="eye" class="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              (click)="confirmDelete(attachment)"
+              [tippy]="'common.delete' | t"
+              class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-red-500/10 hover:text-red-500"
+            >
+              <app-icon name="trash" class="h-4 w-4" />
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</app-dialog-shell>

@@ -1,0 +1,20 @@
+<app-dialog-shell [title]="data.title" [icon]="'warning'">
+  <ul class="max-h-72 overflow-y-auto rounded-xl bg-red-500/10 p-3 text-sm leading-relaxed text-red-600 dark:text-red-400">
+    @for (problem of data.problems; track problem) {
+      <li class="flex items-start gap-2">
+        <app-icon name="error" class="mt-0.5 h-4 w-4 shrink-0" />
+        <span>{{ problem }}</span>
+      </li>
+    }
+  </ul>
+
+  <div class="mt-6 flex justify-end">
+    <button
+      type="button"
+      (click)="close()"
+      class="rounded-xl bg-app-primary px-4 py-2.5 text-sm font-semibold text-app-primary-fg shadow-lg shadow-black/10 transition hover:bg-app-primary-hover focus:ring-2 focus:ring-app-primary focus:ring-offset-2 focus:ring-offset-app-surface focus:outline-none"
+    >
+      {{ 'common.close' | t }}
+    </button>
+  </div>
+</app-dialog-shell>

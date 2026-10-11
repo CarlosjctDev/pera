@@ -1,0 +1,19 @@
+<section class="flex w-full flex-col gap-4 p-4 sm:gap-6 sm:p-6 lg:p-8">
+  <a
+    [routerLink]="masterDataUrl"
+    [tippy]="'common.back' | t"
+    class="inline-flex items-center gap-1.5 text-sm font-medium text-app-muted transition hover:text-app-fg"
+  >
+    <app-icon name="proceed" class="h-4 w-4 rotate-180" />
+    <span>{{ 'nav.masterData' | t }}</span>
+  </a>
+
+  <h1 class="text-xl font-bold tracking-tight">{{ 'masterData.categoriesTitle' | t }}</h1>
+
+  <div
+    class="flex flex-col gap-6 rounded-2xl bg-app-surface p-4 shadow-sm ring-1 ring-app-border sm:p-6"
+  >
+    <app-category-form />
+    <app-category-list />
+  </div>
+</section>

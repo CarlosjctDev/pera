@@ -1,3 +1,319 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+
+/* Dark mode por clase: requiere la clase `.dark` en <html> (ThemeService). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-app-bg: var(--color-lime-50);
+  --color-app-fg: var(--color-zinc-900);
+
+  --color-app-surface: var(--color-white);
+  --color-app-surface-fg: var(--color-zinc-900);
+
+  --color-app-primary: var(--color-lime-600);
+  --color-app-primary-hover: var(--color-lime-700);
+  --color-app-primary-active: var(--color-lime-800);
+  --color-app-primary-fg: var(--color-white);
+
+  --color-app-secondary: var(--color-lime-100);
+  --color-app-secondary-hover: var(--color-lime-200);
+  --color-app-secondary-active: var(--color-lime-300);
+  --color-app-secondary-fg: var(--color-lime-900);
+
+  --color-app-border: var(--color-lime-200);
+  --color-app-border-hover: var(--color-lime-300);
+
+  --color-app-muted: var(--color-slate-500);
+
+  --color-app-scrollbar-track: var(--color-lime-100);
+  --color-app-scrollbar-thumb: var(--color-lime-300);
+  --color-app-scrollbar-thumb-hover: var(--color-lime-400);
+
+  --text-base: 1.125rem; /* 18px */
+}
+
+@layer base {
+  html {
+    @apply bg-app-bg text-app-fg text-base;
+    color-scheme: light;
+    overflow-wrap: break-word;
+  }
+
+  html.dark {
+    --color-app-bg: var(--color-zinc-900);
+    --color-app-fg: var(--color-zinc-100);
+
+    --color-app-surface: var(--color-zinc-800);
+    --color-app-surface-fg: var(--color-zinc-100);
+
+    --color-app-primary: var(--color-lime-500);
+    --color-app-primary-hover: var(--color-lime-400);
+    --color-app-primary-active: var(--color-lime-300);
+    --color-app-primary-fg: var(--color-zinc-950);
+
+    --color-app-secondary: var(--color-zinc-700);
+    --color-app-secondary-hover: var(--color-zinc-600);
+    --color-app-secondary-active: var(--color-zinc-500);
+    --color-app-secondary-fg: var(--color-zinc-100);
+
+    --color-app-border: var(--color-zinc-700);
+    --color-app-border-hover: var(--color-zinc-600);
+
+    --color-app-muted: var(--color-zinc-400);
+
+    --color-app-scrollbar-track: var(--color-zinc-900);
+    --color-app-scrollbar-thumb: var(--color-zinc-600);
+    --color-app-scrollbar-thumb-hover: var(--color-zinc-500);
+
+    @apply bg-app-bg text-app-fg text-base;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply antialiased;
+  }
+
+  input[type='password']::-ms-reveal,
+  input[type='password']::-ms-clear {
+    display: none;
+  }
+
+  /* El input type="search" muestra una × nativa del navegador además de la
+     nuestra (Limpiar búsqueda). Se oculta la nativa; la del componente es la
+     única fuente de limpieza. */
+  input[type='search']::-webkit-search-cancel-button,
+  input[type='search']::-webkit-search-decoration,
+  input[type='search']::-webkit-search-results-button,
+  input[type='search']::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input[type='search']::-ms-clear,
+  input[type='search']::-ms-reveal {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-app-scrollbar-thumb) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      var(--color-app-scrollbar-thumb),
+      var(--color-app-scrollbar-thumb-hover)
+    );
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      180deg,
+      var(--color-app-scrollbar-thumb-hover),
+      var(--color-app-scrollbar-thumb)
+    );
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+/* Diálogos (CDK) estilo SweetAlert: el contenedor a pantalla completa es el que
+   hace scroll, así la barra queda en el borde derecho del viewport (fuera del
+   panel). El panel crece con su contenido en lugar de scrollear por dentro. */
+.cdk-global-overlay-wrapper:has(> .cdk-overlay-pane > .cdk-dialog-container) {
+  box-sizing: border-box;
+  align-items: flex-start !important; /* el centrado lo hacen los márgenes auto del panel */
+  pointer-events: auto; /* mantiene la barra de scroll interactiva (arrastrable) */
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* El panel se centra cuando cabe y queda arriba (scrollable) cuando no. */
+.cdk-overlay-pane:has(> .cdk-dialog-container) {
+  width: 100%;
+  max-height: none;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.cdk-overlay-pane > .cdk-dialog-container {
+  display: flex;
+  justify-content: center;
+}
+
+/* Bloquea el scroll del contenido principal mientras hay un diálogo abierto
+   (comportamiento tipo SweetAlert). El scroller real de la app es <main>, no
+   <html>, por eso BlockScrollStrategy de CDK no lo bloquea por sí solo. */
+body:has(.cdk-overlay-container .cdk-dialog-container) main.app-main {
+  overflow: hidden;
+}
+
+/* Reserva el espacio del scrollbar en <main> para que aparezca/desaparezca
+   sin provocar saltos de layout al abrir y cerrar diálogos. */
+.app-main {
+  scrollbar-gutter: stable;
+}
+
+/* El foco automático que CDK aplica al abrir un diálogo deja el anillo
+   :focus-visible por defecto del navegador sobre los contenedores del overlay
+   (por ejemplo el panel #cdk-overlay-N o el <section role="dialog">), que se
+   ve como un borde cuadrado rodeando el modal. Los contenedores no son
+   interactivos; el indicador de foco lo aportan los controles de dentro. */
+.cdk-overlay-container :is(
+    [id^='cdk-overlay-'],
+    .cdk-global-overlay-wrapper,
+    .cdk-overlay-backdrop,
+    .cdk-overlay-pane,
+    .cdk-dialog-container,
+    app-dialog-shell,
+    section[role='dialog']
+  ):focus-visible {
+  outline: none;
+}
+
+/* La barra de scroll del contenedor del diálogo usa los colores de la app
+   (igual que el scrollbar global), se dibuja fina y redondeada y con un solo
+   pulgar, para no verse como un reborde cuadrado ni quedar invisible en
+   modo oscuro. */
+.cdk-global-overlay-wrapper {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-app-scrollbar-thumb) transparent;
+}
+
+.cdk-global-overlay-wrapper::-webkit-scrollbar {
+  width: 10px;
+}
+
+.cdk-global-overlay-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cdk-global-overlay-wrapper::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    var(--color-app-scrollbar-thumb),
+    var(--color-app-scrollbar-thumb-hover)
+  );
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  background-clip: padding-box;
+}
+
+.cdk-global-overlay-wrapper::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    var(--color-app-scrollbar-thumb-hover),
+    var(--color-app-scrollbar-thumb)
+  );
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Autofill: fondo con tinte diferenciado para que no luzca deshabilitado. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--color-app-bg) inset !important;
+  -webkit-text-fill-color: var(--color-app-fg) !important;
+  caret-color: var(--color-app-fg) !important;
+  border-color: var(--color-app-fg) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/* Tooltips Tippy.js: tema claro y oscuro acorde a la app.
+   El overlay se inyecta en <body> dentro de <html class="dark">, por eso
+   `html.dark` controla la variante oscura sin lógica extra. */
+[data-tippy-root] {
+  z-index: 10000 !important;
+}
+
+.tippy-box {
+  background-color: var(--color-app-bg);
+  color: var(--color-app-fg);
+  border-radius: 10px;
+  box-shadow:
+    0 12px 32px rgb(15 23 42 / 0.18),
+    0 2px 6px rgb(15 23 42 / 0.1);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.45;
+  border: 0;
+}
+
+.tippy-content {
+  padding: 7px 14px;
+}
+
+.tippy-box[data-placement^='top'] > .tippy-arrow::before {
+  border-top-color: var(--color-app-bg);
+}
+
+.tippy-box[data-placement^='bottom'] > .tippy-arrow::before {
+  border-bottom-color: var(--color-app-bg);
+}
+
+.tippy-box[data-placement^='left'] > .tippy-arrow::before {
+  border-left-color: var(--color-app-bg);
+}
+
+.tippy-box[data-placement^='right'] > .tippy-arrow::before {
+  border-right-color: var(--color-app-bg);
+}
+
+html.dark .tippy-box {
+  background-color: var(--color-app-bg);
+  color: var(--color-app-fg);
+  box-shadow:
+    0 12px 32px rgb(0 0 0 / 0.5),
+    0 2px 6px rgb(0 0 0 / 0.35);
+}
+
+html.dark .tippy-box[data-placement^='top'] > .tippy-arrow::before {
+  border-top-color: var(--color-app-bg);
+}
+
+html.dark .tippy-box[data-placement^='bottom'] > .tippy-arrow::before {
+  border-bottom-color: var(--color-app-bg);
+}
+
+html.dark .tippy-box[data-placement^='left'] > .tippy-arrow::before {
+  border-left-color: var(--color-app-bg);
+}
+
+html.dark .tippy-box[data-placement^='right'] > .tippy-arrow::before {
+  border-right-color: var(--color-app-bg);
+}

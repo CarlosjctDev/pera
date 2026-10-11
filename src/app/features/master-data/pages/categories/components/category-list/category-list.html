@@ -1,0 +1,79 @@
+<app-data-table
+  [rows]="categories()"
+  [columns]="columns()"
+  [loading]="loading()"
+  [editTemplate]="editRow() ?? null"
+  [isRowEditing]="isEditing"
+  [emptyLabel]="'categories.empty'"
+/>
+
+<ng-template #nameCell let-category>
+  <div class="flex min-w-0 items-center gap-2">
+    <span
+      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-app-secondary text-app-muted"
+      aria-hidden="true"
+    >
+      <app-icon name="categories" class="h-3.5 w-3.5" />
+    </span>
+    <span class="truncate text-sm font-medium">{{ category.name }}</span>
+  </div>
+</ng-template>
+
+<ng-template #actionsCell let-category>
+  <div class="flex items-center justify-end gap-1">
+    <button
+      type="button"
+      (click)="startEdit(category)"
+      [tippy]="'common.edit' | t"
+      class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-app-secondary hover:text-app-fg"
+    >
+      <app-icon name="edit" class="h-4 w-4" />
+    </button>
+    <button
+      type="button"
+      (click)="confirmDelete(category)"
+      [tippy]="isInUse(category.id) ? ('categories.inUse' | t) : ('common.delete' | t)"
+      [disabled]="isInUse(category.id)"
+      class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-app-muted"
+    >
+      <app-icon name="trash" class="h-4 w-4" />
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #editCell let-category>
+  <form class="min-w-0 flex-1 space-y-2" (ngSubmit)="saveEdit(category)">
+    <div class="flex min-w-0 items-center gap-2">
+      <input
+        type="text"
+        maxlength="60"
+        autocomplete="off"
+        name="edit-category-name"
+        class="min-w-0 flex-1 rounded-lg bg-app-surface px-3 py-1.5 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+        [attr.aria-invalid]="editCategoryDuplicate()"
+        [ngModel]="editCategoryName()"
+        (ngModelChange)="editCategoryName.set($event); editCategoryDuplicate.set(false)"
+      />
+      <button
+        type="submit"
+        [tippy]="'common.save' | t"
+        class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-emerald-600 transition hover:bg-emerald-500/10 dark:text-emerald-400"
+      >
+        <app-icon name="check" class="h-4 w-4" />
+      </button>
+      <button
+        type="button"
+        (click)="cancelEdit()"
+        [tippy]="'common.cancel' | t"
+        class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-app-secondary hover:text-app-fg"
+      >
+        <app-icon name="close" class="h-4 w-4" />
+      </button>
+    </div>
+    @if (editCategoryDuplicate()) {
+      <p class="text-xs text-red-500" role="alert">
+        {{ 'categories.errors.duplicate' | t }}
+      </p>
+    }
+  </form>
+</ng-template>

@@ -1,0 +1,238 @@
+<div class="flex flex-col gap-4 sm:gap-6">
+  <h2 class="text-sm font-semibold tracking-tight text-app-muted">
+    {{ titleKey() | t }}
+  </h2>
+
+  <form
+    (ngSubmit)="add()"
+    class="space-y-4 rounded-2xl bg-app-surface p-4 shadow-sm ring-1 ring-app-border sm:p-6"
+  >
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="space-y-1">
+        <label class="text-sm font-medium" for="account-contact">
+          {{ 'accounts.contact' | t }}
+        </label>
+        <app-select
+          id="account-contact"
+          name="account-contact"
+          [options]="contactOptions()"
+          [placeholder]="'accounts.contactPlaceholder' | t"
+          [invalid]="contactError()"
+          [ngModel]="contactId()"
+          (ngModelChange)="onContactChange($event)"
+        />
+        @if (contactError()) {
+          <p class="text-xs text-red-500" role="alert">{{ 'accounts.errors.contact' | t }}</p>
+        }
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-sm font-medium" for="account-category">
+          {{ 'accounts.category' | t }}
+        </label>
+        <app-select
+          id="account-category"
+          name="account-category"
+          [options]="categoryOptions()"
+          [placeholder]="'accounts.categoryPlaceholder' | t"
+          [invalid]="categoryError()"
+          [ngModel]="categoryId()"
+          (ngModelChange)="onCategoryChange($event)"
+        />
+        @if (categoryError()) {
+          <p class="text-xs text-red-500" role="alert">{{ 'accounts.errors.category' | t }}</p>
+        }
+        @if (categories().length === 0) {
+          <p class="text-xs text-app-muted">{{ 'accounts.errors.categoryEmpty' | t }}</p>
+        }
+      </div>
+
+      <div class="space-y-1">
+        <label class="flex items-center justify-between text-sm font-medium" for="account-amount">
+          <span>{{ 'accounts.amount' | t }}</span>
+          <span class="text-xs font-normal text-app-muted">{{ symbol() }}</span>
+        </label>
+        <input
+          id="account-amount"
+          name="account-amount"
+          type="number"
+          inputmode="decimal"
+          min="0.01"
+          step="0.01"
+          class="w-full rounded-xl bg-app-secondary/50 px-3 py-2 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+          [attr.aria-invalid]="amountError()"
+          [ngModel]="amount()"
+          (ngModelChange)="onAmountChange($event)"
+        />
+        @if (amountError()) {
+          <p class="text-xs text-red-500" role="alert">{{ 'accounts.errors.amount' | t }}</p>
+        }
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-sm font-medium" for="account-concept">
+          {{ 'accounts.concept' | t }}
+        </label>
+        <input
+          id="account-concept"
+          name="account-concept"
+          type="text"
+          maxlength="120"
+          autocomplete="off"
+          class="w-full rounded-xl bg-app-secondary/50 px-3 py-2 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+          [placeholder]="'accounts.conceptPlaceholder' | t"
+          [ngModel]="concept()"
+          (ngModelChange)="concept.set($event)"
+        />
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-sm font-medium" for="account-due-date">
+          {{ 'accounts.dueDate' | t }}
+        </label>
+        <input
+          id="account-due-date"
+          name="account-due-date"
+          type="date"
+          class="w-full rounded-xl bg-app-secondary/50 px-3 py-2 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+          [ngModel]="dueDate()"
+          (ngModelChange)="dueDate.set($event)"
+        />
+      </div>
+    </div>
+
+    <div class="pb-2">
+      <app-schedule-fields
+        #schedule
+        [dateHintKey]="null"
+        [dayHintKey]="'accounts.recurrence.dayHint'"
+        [hintKey]="'accounts.recurrence.generateHint'"
+      />
+    </div>
+
+    <div class="pb-2">
+      <app-attachment-picker [disabled]="schedule.enabled()" />
+    </div>
+
+    <button
+      class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-app-primary px-4 py-2 text-sm font-semibold text-app-primary-fg transition hover:bg-app-primary-hover active:bg-app-primary-active disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+      type="submit"
+      [disabled]="saving()"
+    >
+      @if (saving()) {
+        <app-icon name="loading" class="h-4 w-4 animate-spin" />
+      } @else {
+        <app-icon name="plus" class="h-4 w-4" />
+      }
+
+      {{ (saving() ? 'common.loading' : 'accounts.submit') | t }}
+    </button>
+  </form>
+
+  <app-data-table
+    [rows]="tableRows()"
+    [columns]="columns()"
+    [total]="tableTotal()"
+    [loading]="tableLoading()"
+    [mode]="'server'"
+    [emptyLabel]="'accounts.empty'"
+    (queryChange)="onTableQuery($event)"
+  />
+
+  @if (pendingTotal() > 0) {
+    <p class="text-sm text-app-muted">
+      {{ 'accounts.totalPending' | t }}:
+      <span
+        class="font-semibold tabular-nums"
+        [class]="
+          accountType() === 'receivable'
+            ? 'text-emerald-600 dark:text-emerald-400'
+            : 'text-red-600 dark:text-red-400'
+        "
+      >
+        {{ pendingTotal() | i18nCurrency: currency() }}
+      </span>
+    </p>
+  }
+</div>
+
+<ng-template #amountCell let-account>
+  <span class="truncate text-sm font-semibold tabular-nums" [class]="amountClass(account)">
+    {{ account.amount | i18nCurrency: currency() }}
+  </span>
+</ng-template>
+
+<ng-template #dueDateCell let-account>
+  @if (account.dueDate) {
+    <span class="text-app-muted">{{ account.dueDate | i18nDate }}</span>
+  }
+</ng-template>
+
+<ng-template #statusCell let-account>
+  <span
+    class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
+    [class]="
+      account.status === 'pending'
+        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+    "
+  >
+    {{ statusLabel(account) | t }}
+  </span>
+</ng-template>
+
+<ng-template #actionsCell let-account>
+  <div class="flex items-center justify-end gap-1">
+    <button
+      type="button"
+      (click)="openNotes(account)"
+      [tippy]="'notes.open' | t"
+      class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-xl transition"
+      [class]="
+        hasNotes(account)
+          ? 'bg-app-primary text-app-primary-fg'
+          : 'text-app-muted hover:bg-app-primary/10 hover:text-app-primary'
+      "
+    >
+      <app-icon name="note" class="h-4 w-4" />
+    </button>
+    <button
+      type="button"
+      (click)="viewAttachments(account)"
+      [tippy]="'attachments.viewAll' | t"
+      class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-xl transition"
+      [class]="
+        hasAttachments(account)
+          ? 'bg-app-primary text-app-primary-fg'
+          : 'text-app-muted hover:bg-app-primary/10 hover:text-app-primary'
+      "
+    >
+      <app-icon name="paperclip" class="h-4 w-4" />
+    </button>
+    @if (account.status === 'pending') {
+      <button
+        type="button"
+        [tippy]="'accounts.markPaid' | t"
+        (click)="markPaid(account)"
+        class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 transition hover:bg-amber-500/20 dark:text-amber-400"
+      >
+        <app-icon name="check" class="h-4 w-4" />
+      </button>
+    } @else {
+      <span
+        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+      >
+        <app-icon name="check" class="h-4 w-4" />
+      </span>
+    }
+    <button
+      type="button"
+      (click)="confirmDelete(account)"
+      [tippy]="'common.delete' | t"
+      class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-red-500/10 hover:text-red-500"
+    >
+      <app-icon name="trash" class="h-4 w-4" />
+    </button>
+  </div>
+</ng-template>
+

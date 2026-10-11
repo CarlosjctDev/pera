@@ -1,0 +1,80 @@
+<div class="space-y-3">
+  <h2 class="text-sm font-semibold tracking-tight text-app-muted">
+    {{ 'movements.list' | t }}
+  </h2>
+
+  <app-data-table
+    [rows]="tableRows()"
+    [columns]="columns()"
+    [total]="tableTotal()"
+    [loading]="tableLoading()"
+    [mode]="'server'"
+    [emptyLabel]="'movements.empty'"
+    (queryChange)="onTableQuery($event)"
+  />
+</div>
+
+<ng-template #dateCell let-transaction>
+  <span class="whitespace-nowrap text-app-muted">{{ transaction.date | i18nDate }}</span>
+</ng-template>
+
+<ng-template #detailCell let-transaction>
+  <div class="flex min-w-0 items-center gap-2">
+    <app-icon
+      [name]="transaction.type"
+      class="h-4 w-4 shrink-0"
+      [class]="typeColor(transaction.type)"
+    />
+    <span class="truncate text-sm">{{ detailText(transaction) }}</span>
+    @if (transaction.scheduledId !== undefined) {
+      <span [tippy]="'scheduled.programmed' | t" class="shrink-0 text-app-muted">
+        <app-icon name="activity-log" class="h-3.5 w-3.5" />
+      </span>
+    }
+  </div>
+</ng-template>
+
+<ng-template #amountCell let-transaction>
+  <span class="truncate text-sm font-semibold tabular-nums" [class]="amountClass(transaction.type)">
+    {{ transaction.amount | i18nCurrency: currency() }}
+  </span>
+</ng-template>
+
+<ng-template #actionsCell let-transaction>
+  <div class="flex items-center justify-end gap-1">
+    <button
+      type="button"
+      (click)="openNotes(transaction)"
+      [tippy]="'notes.open' | t"
+      class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg transition"
+      [class]="
+        hasNotes(transaction)
+          ? 'bg-app-primary text-app-primary-fg'
+          : 'text-app-muted hover:bg-app-primary/10 hover:text-app-primary'
+      "
+    >
+      <app-icon name="note" class="h-4 w-4" />
+    </button>
+    <button
+      type="button"
+      (click)="viewAttachments(transaction)"
+      [tippy]="'attachments.viewAll' | t"
+      class="inline-flex h-7 shrink-0 cursor-pointer items-center justify-center gap-1 rounded-lg px-1.5 transition"
+      [class]="
+        hasAttachments(transaction)
+          ? 'bg-app-primary text-app-primary-fg'
+          : 'text-app-muted hover:bg-app-primary/10 hover:text-app-primary'
+      "
+    >
+      <app-icon name="paperclip" class="h-4 w-4" />
+    </button>
+    <button
+      type="button"
+      [tippy]="'common.delete' | t"
+      class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-red-500/10 hover:text-red-500"
+      (click)="confirmDelete(transaction)"
+    >
+      <app-icon name="trash" class="h-4 w-4" />
+    </button>
+  </div>
+</ng-template>

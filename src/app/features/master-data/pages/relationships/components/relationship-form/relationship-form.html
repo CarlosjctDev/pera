@@ -1,0 +1,41 @@
+<form (ngSubmit)="add()" class="flex flex-col gap-2 sm:flex-row sm:items-end">
+  <div class="min-w-0 flex-1 space-y-1">
+    <label class="text-sm font-medium" for="relationship-name">
+      {{ 'relationships.name' | t }}
+    </label>
+    <input
+      id="relationship-name"
+      name="relationship-name"
+      type="text"
+      maxlength="60"
+      autocomplete="off"
+      class="w-full rounded-xl bg-app-secondary/50 px-3 py-2 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+      [placeholder]="'relationships.namePlaceholder' | t"
+      [attr.aria-invalid]="nameError() || nameDuplicate()"
+      [ngModel]="name()"
+      (ngModelChange)="name.set($event); nameError.set(false); nameDuplicate.set(false)"
+    />
+    @if (nameError()) {
+      <p class="text-xs text-red-500" role="alert">{{ 'relationships.errors.name' | t }}</p>
+    }
+    @if (nameDuplicate()) {
+      <p class="text-xs text-red-500" role="alert">
+        {{ 'relationships.errors.duplicate' | t }}
+      </p>
+    }
+  </div>
+
+  <button
+    class="flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-app-primary px-4 py-2 text-sm font-semibold text-app-primary-fg transition hover:bg-app-primary-hover active:bg-app-primary-active disabled:cursor-not-allowed disabled:opacity-50"
+    type="submit"
+    [disabled]="saving()"
+  >
+    @if (saving()) {
+      <app-icon name="loading" class="h-4 w-4 animate-spin" />
+    } @else {
+      <app-icon name="plus" class="h-4 w-4" />
+    }
+
+    {{ (saving() ? 'common.loading' : 'relationships.submit') | t }}
+  </button>
+</form>

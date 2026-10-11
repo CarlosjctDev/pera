@@ -1,0 +1,86 @@
+<button
+  #trigger
+  #origin
+  type="button"
+  role="combobox"
+  aria-haspopup="listbox"
+  [attr.id]="id() || null"
+  [attr.aria-expanded]="open()"
+  [attr.aria-controls]="listboxId"
+  [attr.aria-activedescendant]="open() && !searchable() && filteredOptions().length ? optionId(activeIndex()) : null"
+  [attr.aria-invalid]="invalid()"
+  [disabled]="isDisabled()"
+  (click)="toggle()"
+  (pointerdown)="onPointerDown($event)"
+  (keydown)="onTriggerKeydown($event)"
+  [class]="triggerClasses()"
+>
+  <span class="truncate text-left" [class.text-app-muted]="!selectedLabel()">
+    {{ selectedLabel() || placeholder() }}
+  </span>
+
+  <app-icon name="chevron-down" class="h-4 w-4 shrink-0 text-app-muted transition" />
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="open()"
+  [cdkConnectedOverlayPositions]="positions"
+  [cdkConnectedOverlayWidth]="triggerWidth()"
+  [cdkConnectedOverlayFlexibleDimensions]="true"
+  [cdkConnectedOverlayPush]="true"
+  [cdkConnectedOverlayViewportMargin]="8"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  (backdropClick)="close()"
+  (detach)="close()"
+>
+  <div
+    class="flex max-h-[min(22rem,60vh)] max-w-[calc(100vw-1rem)] flex-col rounded-xl bg-app-surface text-sm text-app-fg shadow-lg ring-1 ring-app-border"
+  >
+    @if (searchable()) {
+      <div class="flex shrink-0 items-center gap-2 border-b border-app-border px-3 py-2">
+        <app-icon name="search" class="h-4 w-4 shrink-0 text-app-muted" />
+        <input
+          #searchInput
+          type="text"
+          autocomplete="off"
+          [value]="query()"
+          (input)="onSearchInput($event)"
+          (keydown)="onSearchKeydown($event)"
+          [attr.placeholder]="'common.search' | t"
+          [attr.aria-label]="'common.search' | t"
+          [attr.aria-controls]="listboxId"
+          [attr.aria-activedescendant]="filteredOptions().length ? optionId(activeIndex()) : null"
+          class="w-full border-0 bg-transparent p-0 text-sm text-app-fg placeholder:text-app-muted focus:outline-none"
+        />
+      </div>
+    }
+
+    <ul
+      [attr.id]="listboxId"
+      role="listbox"
+      class="min-h-0 flex-1 overflow-y-auto overscroll-contain p-1"
+    >
+      @for (option of filteredOptions(); track option.value; let index = $index) {
+        <li
+          [attr.id]="optionId(index)"
+          role="option"
+          [attr.aria-selected]="option.value === selectedValue()"
+          (click)="select(option)"
+          (mouseenter)="activeIndex.set(index)"
+          [class]="optionClasses(option, index)"
+        >
+          <span class="truncate">{{ option.label }}</span>
+
+          @if (option.value === selectedValue()) {
+            <app-icon name="check" class="h-4 w-4 shrink-0 text-app-primary" />
+          }
+        </li>
+      } @empty {
+        <li class="px-3 py-2 text-sm text-app-muted">{{ 'common.noResults' | t }}</li>
+      }
+    </ul>
+  </div>
+</ng-template>

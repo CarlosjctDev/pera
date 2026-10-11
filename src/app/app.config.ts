@@ -1,11 +1,39 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { registerLocaleData } from '@angular/common';
+import localeEn from '@angular/common/locales/en';
+import localeEs from '@angular/common/locales/es';
+import {
+  ApplicationConfig,
+  inject,
+  LOCALE_ID,
+  provideAppInitializer,
+  provideBrowserGlobalErrorListeners,
+  isDevMode,
+} from '@angular/core';
+import { TitleStrategy, provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
+import { PERSISTENCE_PROVIDERS } from './adapters/persistence/persistence.providers';
+import { I18nService } from './core/i18n/i18n.service';
+import { I18nTitleStrategy } from './core/i18n/i18n-title.strategy';
+import { ProfileService } from './features/profile/services/profile.service';
+import { ScheduledMovementService } from './features/transactions/services/scheduled-movement.service';
+import { provideServiceWorker } from '@angular/service-worker';
+
+registerLocaleData(localeEn);
+registerLocaleData(localeEs);
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes)
-  ]
+    provideRouter(routes),
+    { provide: TitleStrategy, useClass: I18nTitleStrategy },
+    { provide: LOCALE_ID, useFactory: () => inject(I18nService).language() },
+    provideAppInitializer(() => inject(ProfileService).load()),
+    provideAppInitializer(() => inject(ScheduledMovementService).generateDue()),
+    ...PERSISTENCE_PROVIDERS,
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
+  ],
 };

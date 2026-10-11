@@ -1,0 +1,27 @@
+<div class="grid gap-4 sm:grid-cols-2">
+  @for (item of kinds; track item) {
+    <button
+      type="button"
+      (click)="select.emit(item)"
+      class="group flex cursor-pointer flex-col gap-4 rounded-2xl bg-app-surface p-4 text-left shadow-sm ring-1 ring-app-border transition hover:ring-2 hover:ring-app-primary sm:p-5"
+    >
+      <span
+        class="flex h-11 w-11 items-center justify-center rounded-xl bg-app-secondary text-app-secondary-fg transition group-hover:text-app-primary"
+      >
+        <app-icon [name]="kindIcon(item)" class="h-5 w-5" />
+      </span>
+      <span class="space-y-1">
+        <span class="block text-base font-semibold">{{ kindLabel(item) | t }}</span>
+        <span class="block text-sm leading-relaxed text-app-muted">
+          {{ kindKindDescription(item) | t }}
+        </span>
+      </span>
+      <span class="text-xs font-medium text-app-muted">
+        {{ 'masterData.itemCount' | t: { count: kindCount(item) } }}
+      </span>
+      <span class="text-xs font-medium text-app-muted">
+        {{ 'masterData.itemSize' | t: { size: kindSize(item) | bytes } }}
+      </span>
+    </button>
+  }
+</div>

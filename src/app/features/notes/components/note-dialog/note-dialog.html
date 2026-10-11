@@ -1,0 +1,80 @@
+<app-dialog-shell [title]="'notes.title' | t" icon="activity-log">
+  <div class="space-y-4">
+    <div class="space-y-3">
+      <div class="space-y-1">
+        <label class="text-sm font-medium" for="note-text">{{ 'notes.text' | t }}</label>
+        <textarea
+          id="note-text"
+          class="note-textarea w-full resize-none rounded-xl bg-app-secondary/50 px-3 py-2 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+          [attr.maxlength]="maxLength"
+          [attr.aria-invalid]="textError()"
+          [attr.placeholder]="'notes.placeholder' | t"
+          [value]="text()"
+          (input)="onText($event)"
+        ></textarea>
+        <div class="flex items-center justify-between gap-2">
+          @if (textError()) {
+            <p class="text-xs text-red-500" role="alert">{{ 'notes.textRequired' | t }}</p>
+          } @else {
+            <span></span>
+          }
+          <span class="text-xs tabular-nums text-app-muted">
+            {{ text().length }}/{{ maxLength }}
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-end gap-3">
+        <div class="min-w-0 flex-1 space-y-1">
+          <label class="text-sm font-medium" for="note-date">{{ 'notes.date' | t }}</label>
+          <input
+            id="note-date"
+            type="date"
+            class="w-full rounded-xl bg-app-secondary/50 px-3 py-2 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+            [attr.max]="maxDate"
+            [attr.aria-invalid]="dateError()"
+            [value]="date()"
+            (input)="onDate($event)"
+          />
+        </div>
+        <button
+          type="button"
+          (click)="add()"
+          [disabled]="saving()"
+          class="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-app-primary px-4 py-2 text-sm font-semibold text-app-primary-fg transition hover:bg-app-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <app-icon name="plus" class="h-4 w-4" />
+          {{ 'notes.add' | t }}
+        </button>
+      </div>
+      @if (dateError()) {
+        <p class="text-xs text-red-500" role="alert">{{ 'notes.futureDate' | t }}</p>
+      }
+    </div>
+
+    <div class="border-t border-app-border pt-3">
+      @if (notes().length === 0) {
+        <p class="text-sm text-app-muted">{{ 'notes.empty' | t }}</p>
+      } @else {
+        <ul class="max-h-64 space-y-2 overflow-y-auto">
+          @for (note of notes(); track note.id) {
+            <li class="flex items-start gap-2 rounded-xl bg-app-secondary px-3 py-2">
+              <div class="min-w-0 flex-1">
+                <p class="break-words whitespace-pre-wrap text-sm text-app-fg">{{ note.text }}</p>
+                <p class="mt-0.5 text-xs text-app-muted">{{ note.date | i18nDate }}</p>
+              </div>
+              <button
+                type="button"
+                (click)="remove(note)"
+                [tippy]="'common.delete' | t"
+                class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-red-500/10 hover:text-red-500"
+              >
+                <app-icon name="trash" class="h-4 w-4" />
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+</app-dialog-shell>

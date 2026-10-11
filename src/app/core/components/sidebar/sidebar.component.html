@@ -1,0 +1,104 @@
+<aside
+  [class.translate-x-0]="open()"
+  [class.w-64]="!collapsed()"
+  [class.w-20]="collapsed()"
+  class="fixed bottom-0 left-0 top-16 z-50 flex -translate-x-full flex-col overflow-y-auto overscroll-contain border-r border-app-border bg-app-surface/95 shadow-xl shadow-black/5 backdrop-blur transition-all duration-300 lg:h-full lg:static lg:inset-auto lg:z-auto lg:translate-x-0"
+>
+  <div
+    class="flex w-full shrink-0 items-center justify-between gap-2 px-3 pb-2 pt-4"
+    [class.justify-center]="collapsed()"
+    [class.px-0]="collapsed()"
+  >
+    @if (!collapsed()) {
+      <p class="px-1 text-xs font-medium uppercase tracking-wider text-app-muted">
+        {{ 'sidebar.label' | t }}
+      </p>
+    }
+
+    <button
+      type="button"
+      (click)="toggleCollapsed()"
+      [attr.aria-label]="collapsed() ? ('sidebar.expand' | t) : ('sidebar.collapse' | t)"
+      [tippy]="collapsed() ? ('sidebar.expand' | t) : ('sidebar.collapse' | t)"
+      [tippyEnabled]="collapsed()"
+      class="flex h-8 w-8 items-center justify-center rounded-lg text-app-muted transition hover:bg-app-secondary hover:text-app-fg"
+    >
+      @if (collapsed()) {
+        <app-icon name="expand" class="h-4 w-4" />
+      } @else {
+        <app-icon name="collapse" class="h-4 w-4" />
+      }
+    </button>
+  </div>
+
+  <nav
+    class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain pb-4"
+    [class.px-3]="!collapsed()"
+    [class.px-2]="collapsed()"
+  >
+    @for (item of items(); track item.label) {
+      <button
+        type="button"
+        (click)="selectItem(item)"
+        [attr.aria-disabled]="item.enabled ? null : 'true'"
+        [attr.data-testid]="item.testId"
+        [tippy]="item.label"
+        [tippyPlacement]="collapsed() ? 'right' : 'top'"
+        [tippyEnabled]="collapsed()"
+        class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors"
+        [class.justify-center]="collapsed()"
+        [class.px-0]="collapsed()"
+        [class.bg-app-primary/10]="item.active"
+        [class.text-app-primary]="item.active"
+        [class.cursor-pointer]="item.enabled && !item.active"
+        [class.hover:bg-app-secondary]="item.enabled && !item.active"
+        [class.text-app-fg]="item.enabled && !item.active"
+        [class.cursor-not-allowed]="!item.enabled"
+        [class.text-app-muted]="!item.enabled"
+      >
+        <app-nav-icon [icon]="item.icon" />
+        @if (!collapsed()) {
+          <span class="flex-1 text-left">{{ item.label }}</span>
+          @if (!item.enabled) {
+            <span
+              class="rounded-full bg-app-secondary px-2 py-0.5 text-[10px] font-medium text-app-muted"
+            >
+              {{ 'sidebar.soon' | t }}
+            </span>
+          }
+        }
+      </button>
+    } @empty {
+      <p class="flex flex-1 items-center justify-center px-3 text-center text-xs text-app-muted">
+        {{ 'sidebar.empty' | t }}
+      </p>
+    }
+  </nav>
+
+  <div class="shrink-0 border-t border-app-border p-3">
+    @if (collapsed()) {
+      <div class="flex items-center justify-center">
+        <button
+          type="button"
+          (click)="searchRequested.emit()"
+          [tippy]="'sidebar.searchAction' | t"
+          [attr.aria-label]="'sidebar.searchAction' | t"
+          class="relative flex h-10 w-10 items-center justify-center rounded-xl text-app-muted transition hover:bg-app-secondary hover:text-app-fg"
+        >
+          <app-icon name="search" class="h-5 w-5" />
+          @if (filter()) {
+            <span
+              class="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-app-primary ring-2 ring-app-surface"
+            ></span>
+          }
+        </button>
+      </div>
+    } @else {
+      <app-search-field
+        [value]="filter()"
+        [placeholder]="'sidebar.searchPlaceholder' | t"
+        (valueChange)="onFilterChange($event)"
+      ></app-search-field>
+    }
+  </div>
+</aside>

@@ -1,0 +1,95 @@
+<section class="h-full">
+  <div class="absolute top-4 right-4 flex items-center gap-2">
+    @if (!isWelcome) {
+      <app-language [compact]="true" />
+    }
+    <app-theme [compact]="true" />
+  </div>
+  <div class="welcome">
+    <div class="welcome__card">
+      <div class="welcome__icon" aria-hidden="true">
+        <img src="icono.png" alt="" />
+      </div>
+
+      <h1>{{ 'welcome.title' | t }}</h1>
+      <p class="welcome__subtitle">{{ 'welcome.subtitle' | t }}</p>
+
+      <form class="welcome__form" (ngSubmit)="continue()">
+        <label class="welcome__label" for="name">{{ 'welcome.nameLabel' | t }}</label>
+        <div class="relative">
+          <input
+            class="welcome__input pr-16"
+            id="name"
+            name="name"
+            type="text"
+            autocomplete="given-name"
+            autocapitalize="words"
+            [placeholder]="'welcome.namePlaceholder' | t"
+            [disabled]="saving()"
+            [maxlength]="maxNameLength"
+            [attr.aria-invalid]="error()"
+            [attr.aria-describedby]="error() ? 'name-error' : null"
+            [ngModel]="name()"
+            (ngModelChange)="name.set($event); error.set(false)"
+          />
+          <span
+            class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-app-muted"
+            aria-hidden="true"
+          >
+            {{ name().length }}/{{ maxNameLength }}
+          </span>
+        </div>
+
+        @if (error()) {
+          <p class="welcome__error" id="name-error" role="alert">
+            {{ 'welcome.nameRequired' | t }}
+          </p>
+        }
+
+        <label class="welcome__label" for="currency">{{ 'profile.currency' | t }}</label>
+        <app-select
+          id="currency"
+          name="currency"
+          [disabled]="saving()"
+          [options]="currencyOptions()"
+          [ngModel]="currency()"
+          (ngModelChange)="currency.set($event)"
+        />
+
+        <button
+          class="flex items-center justify-center gap-2 cursor-pointer rounded-lg px-4 py-2 text-sm font-semibold bg-app-primary text-app-primary-fg hover:bg-app-primary-hover active:bg-app-primary-active disabled:cursor-not-allowed disabled:opacity-50"
+          type="submit"
+          [disabled]="saving()"
+        >
+          @if (saving()) {
+            <app-icon name="loading" class="h-4 w-4 animate-spin" />
+          } @else {
+            <app-icon name="save" class="h-4 w-4" />
+          }
+
+          {{ (saving() ? 'common.loading' : 'welcome.submit') | t }}
+        </button>
+      </form>
+
+      @if (isWelcome) {
+        <button
+          type="button"
+          (click)="onImport()"
+          [disabled]="saving()"
+          class="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-app-secondary px-4 py-2 text-sm font-semibold text-app-secondary-fg ring-1 ring-inset ring-app-border transition hover:bg-app-secondary-hover hover:text-app-fg disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <app-icon name="database" class="h-4 w-4" />
+          {{ 'welcome.importTitle' | t }}
+        </button>
+      }
+
+      <input
+        #importInput
+        type="file"
+        accept=".json,application/json"
+        class="hidden"
+        (change)="onImportFile($event)"
+      />
+    </div>
+  </div>
+</section>

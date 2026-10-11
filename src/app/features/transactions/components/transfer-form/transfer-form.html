@@ -1,0 +1,123 @@
+<form
+  (ngSubmit)="submit()"
+  class="space-y-4 rounded-2xl bg-app-surface p-4 shadow-sm ring-1 ring-app-border sm:p-6"
+>
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div class="space-y-1">
+      <label class="flex items-center justify-between text-sm font-medium" for="amount">
+        <span>{{ 'movements.amount' | t }}</span>
+        <span class="text-xs font-normal text-app-muted">{{ symbol() }}</span>
+      </label>
+      <input
+        id="amount"
+        name="amount"
+        type="number"
+        inputmode="decimal"
+        min="0.01"
+        step="0.01"
+        class="w-full rounded-xl bg-app-secondary/50 px-3 py-2 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+        [attr.aria-invalid]="amountError()"
+        [ngModel]="amount()"
+        (ngModelChange)="onAmountChange($event)"
+      />
+      @if (amountError()) {
+        <p class="text-xs text-red-500" role="alert">{{ 'movements.errors.amount' | t }}</p>
+      }
+    </div>
+
+    <div class="space-y-1">
+      <label class="text-sm font-medium" for="category">
+        {{ 'movements.category' | t }}
+      </label>
+      <app-select
+        id="category"
+        name="category"
+        [options]="categoryOptions()"
+        [placeholder]="'movements.categoryPlaceholder' | t"
+        [invalid]="categoryError()"
+        [ngModel]="categoryId()"
+        (ngModelChange)="onCategoryChange($event)"
+      />
+      @if (categoryError()) {
+        <p class="text-xs text-red-500" role="alert">{{ 'movements.errors.category' | t }}</p>
+      } @else if (categories().length === 0) {
+        <p class="text-xs text-app-muted">{{ 'movements.needCategories' | t }}</p>
+      }
+    </div>
+  </div>
+
+  @if (showContactPicker) {
+    <div class="space-y-1">
+      <label class="text-sm font-medium" for="contact">
+        {{ 'movements.contact' | t }}
+      </label>
+      <app-select
+        id="contact"
+        name="contact"
+        [options]="contactOptions()"
+        [placeholder]="'movements.contactPlaceholder' | t"
+        [invalid]="contactError()"
+        [ngModel]="contactId()"
+        (ngModelChange)="onContactChange($event)"
+      />
+      @if (contactError()) {
+        <p class="text-xs text-red-500" role="alert">{{ 'movements.errors.contact' | t }}</p>
+      } @else if (contacts().length === 0) {
+        <p class="text-xs text-app-muted">{{ 'movements.needContacts' | t }}</p>
+      }
+    </div>
+  }
+
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div class="space-y-1">
+      <label class="text-sm font-medium" for="concept">
+        {{ 'movements.concept' | t }}
+      </label>
+      <input
+        id="concept"
+        name="concept"
+        type="text"
+        maxlength="120"
+        autocomplete="off"
+        class="w-full rounded-xl bg-app-secondary/50 px-3 py-2 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+        [placeholder]="'movements.conceptPlaceholder' | t"
+        [ngModel]="concept()"
+        (ngModelChange)="concept.set($event)"
+      />
+    </div>
+
+    <div class="space-y-1">
+      <label class="text-sm font-medium" for="date">{{ 'movements.date' | t }}</label>
+      <input
+        id="date"
+        name="date"
+        type="date"
+        class="w-full rounded-xl bg-app-secondary/50 px-3 py-2 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+        [ngModel]="date()"
+        (ngModelChange)="date.set($event)"
+      />
+    </div>
+  </div>
+
+  <div class="pb-2">
+    <app-schedule-fields #schedule />
+  </div>
+
+  <div class="pb-2">
+    <app-attachment-picker [disabled]="schedule.enabled()" />
+  </div>
+
+  <button
+    class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-app-primary px-4 py-2 text-sm font-semibold text-app-primary-fg transition hover:bg-app-primary-hover active:bg-app-primary-active disabled:cursor-not-allowed disabled:opacity-50"
+    type="submit"
+    [disabled]="saving()"
+  >
+    @if (saving()) {
+      <app-icon name="loading" class="h-4 w-4 animate-spin" />
+    } @else {
+      <app-icon name="plus" class="h-4 w-4" />
+    }
+
+    {{ (saving() ? 'common.loading' : 'movements.submit') | t }}
+  </button>
+</form>

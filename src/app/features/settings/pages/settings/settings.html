@@ -1,0 +1,274 @@
+
+<section class="flex w-full flex-col gap-6 p-4 sm:gap-8 sm:p-6 lg:p-8">
+  <h1 class="text-xl font-bold tracking-tight">
+    {{ 'nav.settings' | t }}
+  </h1>
+
+  <!-- Datos y copias de seguridad -->
+  <section class="flex flex-col gap-4">
+    <div class="space-y-1">
+      <h2 class="text-base font-semibold">
+        {{ 'settings.data.sectionTitle' | t }}
+      </h2>
+      <p class="text-sm text-app-muted">
+        {{ 'settings.data.sectionDescription' | t }}
+      </p>
+    </div>
+
+    <div
+      class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] items-stretch gap-4 sm:gap-5"
+    >
+      <!-- Exportar datos -->
+      <article
+        class="flex h-full min-w-0 flex-col gap-4 rounded-2xl bg-app-surface p-4 shadow-sm ring-1 ring-app-border sm:p-5"
+      >
+        <div
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-app-secondary text-app-secondary-fg"
+        >
+          <app-icon name="save" class="h-5 w-5" />
+        </div>
+
+        <div class="min-w-0 space-y-1">
+          <h3 class="text-base font-semibold">
+            {{ 'settings.data.exportTitle' | t }}
+          </h3>
+          <p class="text-sm leading-relaxed text-app-muted">
+            {{ 'settings.data.exportDescription' | t }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="onExport()"
+          [disabled]="exporting()"
+          class="mt-auto flex w-full items-center justify-center gap-2 rounded-xl bg-app-primary px-4 py-2.5 text-sm font-semibold text-app-primary-fg transition hover:bg-app-primary-hover focus:ring-2 focus:ring-app-primary focus:ring-offset-2 focus:ring-offset-app-surface focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          @if (exporting()) {
+            <app-icon name="loading" class="h-4 w-4 animate-spin" />
+          } @else {
+            <app-icon name="save" class="h-4 w-4" />
+          }
+
+          {{
+            (exporting()
+              ? 'settings.data.exporting'
+              : 'settings.data.export') | t
+          }}
+        </button>
+      </article>
+
+      <!-- Importar datos -->
+      <article
+        class="flex h-full min-w-0 flex-col gap-4 rounded-2xl bg-app-surface p-4 shadow-sm ring-1 ring-app-border sm:p-5"
+      >
+        <div
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-app-secondary text-app-secondary-fg"
+        >
+          <app-icon name="database" class="h-5 w-5" />
+        </div>
+
+        <div class="min-w-0 space-y-1">
+          <h3 class="text-base font-semibold">
+            {{ 'settings.data.importTitle' | t }}
+          </h3>
+          <p class="text-sm leading-relaxed text-app-muted">
+            {{ 'settings.data.importDescription' | t }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="onImport()"
+          [disabled]="importing()"
+          class="mt-auto flex w-full items-center justify-center gap-2 rounded-xl bg-app-primary px-4 py-2.5 text-sm font-semibold text-app-primary-fg transition hover:bg-app-primary-hover focus:ring-2 focus:ring-app-primary focus:ring-offset-2 focus:ring-offset-app-surface focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          @if (importing()) {
+            <app-icon name="loading" class="h-4 w-4 animate-spin" />
+          } @else {
+            <app-icon name="database" class="h-4 w-4" />
+          }
+
+          {{
+            (importing()
+              ? 'settings.data.importing'
+              : 'settings.data.import') | t
+          }}
+        </button>
+
+        <input
+          #importInput
+          type="file"
+          accept=".json,application/json"
+          class="hidden"
+          (change)="onImportFile($event)"
+        />
+      </article>
+
+      <!-- Copias de seguridad -->
+      <article
+        class="flex h-full min-w-0 flex-col gap-4 rounded-2xl bg-app-surface p-4 shadow-sm ring-1 ring-app-border sm:p-5"
+      >
+        <div
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-app-secondary text-app-secondary-fg"
+        >
+          <app-icon name="database" class="h-5 w-5" />
+        </div>
+
+        <div class="min-w-0 space-y-1">
+          <h3 class="text-base font-semibold">
+            {{ 'settings.backups.title' | t }}
+          </h3>
+          <p class="text-sm leading-relaxed text-app-muted">
+            {{ 'settings.backups.description' | t }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="onOpenBackups()"
+          class="mt-auto flex w-full items-center justify-center gap-2 rounded-xl bg-app-primary px-4 py-2.5 text-sm font-semibold text-app-primary-fg transition hover:bg-app-primary-hover focus:ring-2 focus:ring-app-primary focus:ring-offset-2 focus:ring-offset-app-surface focus:outline-none"
+        >
+          <app-icon name="database" class="h-4 w-4" />
+          {{ 'settings.backups.button' | t }}
+        </button>
+      </article>
+    </div>
+  </section>
+
+  <!-- Aplicación -->
+  <section class="flex flex-col gap-4">
+    <div class="space-y-1">
+      <h2 class="text-base font-semibold">
+        {{ 'settings.app.sectionTitle' | t }}
+      </h2>
+      <p class="text-sm text-app-muted">
+        {{ 'settings.app.sectionDescription' | t :appNameParams()}}
+      </p>
+    </div>
+
+    <div
+      class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] items-stretch gap-4 sm:gap-5"
+    >
+      <!-- Idioma -->
+      <article
+        class="flex h-full min-w-0 flex-col gap-4 rounded-2xl bg-app-surface p-4 shadow-sm ring-1 ring-app-border sm:p-5"
+      >
+        <div
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-app-secondary text-app-secondary-fg"
+        >
+          <app-icon name="globe" class="h-5 w-5" />
+        </div>
+
+        <div class="min-w-0 space-y-1">
+          <h3 class="text-base font-semibold">
+            {{ 'settings.language' | t }}
+          </h3>
+        </div>
+
+        <app-language class="mt-auto" />
+      </article>
+
+      <!-- Acerca de Pera -->
+      <article
+        class="flex h-full min-w-0 flex-col gap-4 rounded-2xl bg-app-surface p-4 shadow-sm ring-1 ring-app-border sm:p-5"
+      >
+        <div
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-app-secondary text-app-secondary-fg"
+        >
+          <app-icon name="info" class="h-5 w-5" />
+        </div>
+
+        <div class="min-w-0 space-y-1">
+          <h3 class="text-base font-semibold">
+            {{ 'settings.about.title' | t }}
+          </h3>
+          <p class="text-sm leading-relaxed text-app-muted">
+            {{ 'settings.about.description' | t }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="onOpenAbout()"
+          class="mt-auto flex w-full items-center justify-center gap-2 rounded-xl bg-app-primary px-4 py-2.5 text-sm font-semibold text-app-primary-fg transition hover:bg-app-primary-hover focus:ring-2 focus:ring-app-primary focus:ring-offset-2 focus:ring-offset-app-surface focus:outline-none"
+        >
+          <app-icon name="info" class="h-4 w-4" />
+          {{ 'settings.about.button' | t }}
+        </button>
+      </article>
+
+      <!-- Políticas -->
+      <article
+        class="flex h-full min-w-0 flex-col gap-4 rounded-2xl bg-app-surface p-4 shadow-sm ring-1 ring-app-border sm:p-5"
+      >
+        <div
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-app-secondary text-app-secondary-fg"
+        >
+          <app-icon name="security" class="h-5 w-5" />
+        </div>
+
+        <div class="min-w-0 space-y-1">
+          <h3 class="text-base font-semibold">
+            {{ 'settings.policies.title' | t }}
+          </h3>
+          <p class="text-sm leading-relaxed text-app-muted">
+            {{ 'settings.policies.description' | t }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="onOpenPolicies()"
+          class="mt-auto flex w-full items-center justify-center gap-2 rounded-xl bg-app-primary px-4 py-2.5 text-sm font-semibold text-app-primary-fg transition hover:bg-app-primary-hover focus:ring-2 focus:ring-app-primary focus:ring-offset-2 focus:ring-offset-app-surface focus:outline-none"
+        >
+          <app-icon name="security" class="h-4 w-4" />
+          {{ 'settings.policies.button' | t }}
+        </button>
+      </article>
+
+      <!-- Instalar Pera: agregar cuando tengas implementada la instalación PWA -->
+    </div>
+  </section>
+
+  <!-- Zona de peligro -->
+  <section class="flex flex-col gap-4">
+    <div class="space-y-1">
+      <h2 class="text-base font-semibold text-red-500">
+        {{ 'settings.deleteAccount.title' | t }}
+      </h2>
+      <p class="text-sm text-app-muted">
+        {{ 'settings.deleteAccount.description' | t }}
+      </p>
+    </div>
+
+    <article
+      class="flex min-w-0 flex-col gap-4 rounded-2xl bg-app-surface p-4 shadow-sm ring-1 ring-red-500/30 sm:flex-row sm:items-center sm:justify-between sm:p-5"
+    >
+      <div class="flex min-w-0 items-start gap-3">
+        <div
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-500"
+        >
+          <app-icon name="trash" class="h-5 w-5" />
+        </div>
+
+        <div class="min-w-0 space-y-1">
+          <h3 class="text-base font-semibold">
+            {{ 'settings.deleteAccount.title' | t }}
+          </h3>
+          <p class="text-sm leading-relaxed text-app-muted">
+            {{ 'settings.deleteAccount.description' | t }}
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        (click)="onDeleteAccount()"
+        class="flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-app-surface focus:outline-none sm:w-auto"
+      >
+        <app-icon name="trash" class="h-4 w-4" />
+        {{ 'settings.deleteAccount.button' | t }}
+      </button>
+    </article>
+  </section>
+</section>

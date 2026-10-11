@@ -1,0 +1,80 @@
+<section class="flex w-full flex-col gap-4 p-4 sm:gap-6 sm:p-6 lg:p-8">
+  <h1 class="text-xl font-bold tracking-tight">{{ 'nav.masterData' | t }}</h1>
+
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <a
+      [routerLink]="categoriesUrl"
+      class="group flex flex-col gap-4 rounded-2xl bg-app-surface p-4 sm:p-5 shadow-sm ring-1 ring-app-border transition hover:ring-2 hover:ring-app-primary"
+    >
+      <span
+        class="flex h-11 w-11 items-center justify-center rounded-xl bg-app-secondary text-app-secondary-fg transition group-hover:text-app-primary"
+      >
+        <app-icon name="categories" class="h-5 w-5" />
+      </span>
+      <span class="space-y-1">
+        <span class="block text-base font-semibold">
+          {{ 'masterData.categoriesTitle' | t }}
+        </span>
+        <span class="block text-sm leading-relaxed text-app-muted">
+          {{ 'masterData.categoriesDescription' | t }}
+        </span>
+      </span>
+      <span class="text-xs font-medium text-app-muted">
+        {{ 'masterData.itemCount' | t: { count: categories().length } }}
+      </span>
+      <span class="text-xs font-medium text-app-muted">
+        {{ 'masterData.itemSize' | t: { size: categoriesSize() | bytes } }}
+      </span>
+    </a>
+
+    <a
+      [routerLink]="relationshipsUrl"
+      class="group flex flex-col gap-4 rounded-2xl bg-app-surface p-4 sm:p-5 shadow-sm ring-1 ring-app-border transition hover:ring-2 hover:ring-app-primary"
+    >
+      <span
+        class="flex h-11 w-11 items-center justify-center rounded-xl bg-app-secondary text-app-secondary-fg transition group-hover:text-app-primary"
+      >
+        <app-icon name="connected" class="h-5 w-5" />
+      </span>
+      <span class="space-y-1">
+        <span class="block text-base font-semibold">
+          {{ 'masterData.relationshipsTitle' | t }}
+        </span>
+        <span class="block text-sm leading-relaxed text-app-muted">
+          {{ 'masterData.relationshipsDescription' | t }}
+        </span>
+      </span>
+      <span class="text-xs font-medium text-app-muted">
+        {{ 'masterData.itemCount' | t: { count: relationshipTypes().length } }}
+      </span>
+      <span class="text-xs font-medium text-app-muted">
+        {{ 'masterData.itemSize' | t: { size: relationshipTypesSize() | bytes } }}
+      </span>
+    </a>
+
+    <a
+      [routerLink]="contactsUrl"
+      class="group flex flex-col gap-4 rounded-2xl bg-app-surface p-4 sm:p-5 shadow-sm ring-1 ring-app-border transition hover:ring-2 hover:ring-app-primary"
+    >
+      <span
+        class="flex h-11 w-11 items-center justify-center rounded-xl bg-app-secondary text-app-secondary-fg transition group-hover:text-app-primary"
+      >
+        <app-icon name="users" class="h-5 w-5" />
+      </span>
+      <span class="space-y-1">
+        <span class="block text-base font-semibold">
+          {{ 'masterData.contactsTitle' | t }}
+        </span>
+        <span class="block text-sm leading-relaxed text-app-muted">
+          {{ 'masterData.contactsDescription' | t }}
+        </span>
+      </span>
+      <span class="text-xs font-medium text-app-muted">
+        {{ 'masterData.itemCount' | t: { count: contacts().length } }}
+      </span>
+      <span class="text-xs font-medium text-app-muted">
+        {{ 'masterData.itemSize' | t: { size: contactsSize() | bytes } }}
+      </span>
+    </a>
+  </div>
+</section>

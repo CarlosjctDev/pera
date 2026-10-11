@@ -1,0 +1,53 @@
+<section class="flex w-full flex-col gap-4 p-4 sm:gap-6 sm:p-6 lg:p-8">
+  <h1 class="text-xl font-bold tracking-tight">{{ 'nav.movements' | t }}</h1>
+
+  <div class="flex flex-wrap gap-2">
+    @for (section of sections; track section) {
+      <button type="button" (click)="selectSection(section)" [class]="sectionClass(section)">
+        <app-icon [name]="sectionIcon(section)" class="h-4 w-4" />
+        <span>{{ sectionLabel(section) | t }}</span>
+      </button>
+    }
+    <button
+      type="button"
+      (click)="openScheduled()"
+      [tippy]="'scheduled.listButtonHint' | t"
+      class="ml-auto inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-app-secondary px-3 py-2 text-sm font-semibold text-app-secondary-fg transition hover:bg-app-secondary-hover"
+    >
+      <app-icon name="activity-log" class="h-4 w-4" />
+      <span>{{ 'scheduled.listButton' | t }}</span>
+    </button>
+  </div>
+
+  @if (section() === 'receivable') {
+    <app-accounts accountType="receivable" />
+  } @else if (section() === 'payable') {
+    <app-accounts accountType="payable" />
+  } @else if (type() === null) {
+    <app-movement-types (select)="selectType($event)" />
+  } @else {
+    <button
+      type="button"
+      (click)="backToTypes()"
+      [tippy]="'common.back' | t"
+      class="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-app-muted transition hover:text-app-fg"
+    >
+      <app-icon name="proceed" class="h-4 w-4 rotate-180" />
+      <span>{{ typeLabel(selectedType()) | t }}</span>
+    </button>
+
+    @if (type() === 'income') {
+      <app-income-form />
+    } @else if (type() === 'expense') {
+      <app-expense-form />
+    } @else if (type() === 'saving') {
+      <app-saving-form />
+    } @else if (type() === 'investment') {
+      <app-investment-form />
+    } @else {
+      <app-transfer-form />
+    }
+
+    <app-movement-list />
+  }
+</section>

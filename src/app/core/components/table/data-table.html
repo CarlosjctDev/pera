@@ -1,0 +1,132 @@
+<div class="overflow-hidden rounded-2xl bg-app-surface shadow-sm ring-1 ring-app-border">
+  <div [style.max-height]="maxHeight()" class="overflow-auto">
+    <table class="min-w-full text-sm">
+      <thead>
+        <tr class="border-b border-app-border text-xs">
+          @for (column of columns(); track column.key) {
+            <th [class]="headerClass(column)">
+              @if (column.sortable) {
+                <button
+                  type="button"
+                  (click)="toggleSort(column)"
+                  class="inline-flex cursor-pointer items-center gap-1 transition hover:text-app-fg focus:outline-none"
+                >
+                  <span>{{ column.labelKey | t }}</span>
+                  @if (isSorted(column)) {
+                    <app-icon [name]="sortIcon(column)" class="h-3.5 w-3.5" />
+                  }
+                </button>
+              } @else {
+                <span>{{ column.labelKey | t }}</span>
+              }
+
+              @if (column.searchable) {
+                <input
+                  type="search"
+                  [value]="searchTerms()[column.key] || ''"
+                  (input)="onSearchInput(column, $event)"
+                  [placeholder]="'common.search' | t"
+                  [attr.aria-label]="column.labelKey | t"
+                  class="mt-1.5 w-full min-w-[7rem] rounded-lg border-0 bg-app-surface px-2 py-1 text-xs text-app-fg placeholder:text-app-muted ring-1 ring-inset ring-app-border transition focus:outline-none focus:ring-2 focus:ring-app-primary"
+                />
+              }
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-app-border">
+        @if (loading() && visibleRows().length === 0) {
+          <tr>
+            <td [attr.colspan]="columns().length" class="px-3 py-8 text-center text-app-muted">
+              {{ 'common.loading' | t }}
+            </td>
+          </tr>
+        } @else if (visibleRows().length === 0) {
+          <tr>
+            <td [attr.colspan]="columns().length" class="px-3 py-8 text-center text-app-muted">
+              {{ emptyLabel() | t }}
+            </td>
+          </tr>
+        } @else {
+          @for (row of visibleRows(); track rowId(row)) {
+            @if (isRowEditing()?.(row) && editTemplate()) {
+              <tr>
+                <td [attr.colspan]="columns().length" class="px-3 py-2">
+                  <ng-container
+                    [ngTemplateOutlet]="editTemplate()"
+                    [ngTemplateOutletContext]="{ $implicit: row }"
+                  />
+                </td>
+              </tr>
+            } @else {
+              <tr class="transition hover:bg-app-secondary/30">
+                @for (column of columns(); track column.key) {
+                  <td [class]="cellClass(column)">
+                    @if (column.cellTemplate) {
+                      <ng-container
+                        [ngTemplateOutlet]="column.cellTemplate"
+                        [ngTemplateOutletContext]="{ $implicit: row }"
+                      />
+                    } @else {
+                      {{ formatValue(row, column) }}
+                    }
+                  </td>
+                }
+              </tr>
+            }
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (effectiveTotal() > 0 || loading()) {
+    <div
+      class="flex flex-wrap items-center justify-between gap-3 border-t border-app-border px-3 py-2.5 text-xs text-app-muted"
+    >
+      <label class="flex items-center gap-2">
+        <span>{{ 'table.pageSize' | t }}</span>
+        <app-select
+          class="w-24"
+          size="sm"
+          [searchable]="false"
+          [options]="pageSizeSelectOptions()"
+          [ngModel]="pageSize()"
+          (ngModelChange)="onPageSizeChange($event)"
+        />
+      </label>
+
+      <span class="tabular-nums">
+        {{ 'table.results' | t: { from: rangeFrom(), to: rangeTo(), total: effectiveTotal() } }}
+      </span>
+
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="page() === 0"
+          [tippy]="'table.previous' | t"
+          class="inline-flex cursor-pointer items-center gap-1 rounded-lg bg-app-secondary px-2 py-1 font-medium text-app-secondary-fg transition hover:bg-app-secondary-hover hover:text-app-fg disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <app-icon name="collapse" class="h-3.5 w-3.5" />
+          <span>{{ 'table.previous' | t }}</span>
+        </button>
+
+        <span class="tabular-nums">
+          {{ 'table.pageOf' | t: { page: page() + 1, totalPages: pageCount() } }}
+        </span>
+
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="page() + 1 >= pageCount()"
+          [tippy]="'table.next' | t"
+          class="inline-flex cursor-pointer items-center gap-1 rounded-lg bg-app-secondary px-2 py-1 font-medium text-app-secondary-fg transition hover:bg-app-secondary-hover hover:text-app-fg disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <span>{{ 'table.next' | t }}</span>
+          <app-icon name="expand" class="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
+  }
+</div>

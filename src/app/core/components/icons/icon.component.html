@@ -1,0 +1,58 @@
+<svg
+  fill="none"
+  stroke="currentColor"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  [attr.viewBox]="icon().viewBox"
+  [attr.stroke-width]="strokeWidth()"
+  aria-hidden="true"
+  focusable="false"
+  class="h-full w-full"
+>
+  @for (node of icon().nodes; track $index) {
+    @switch (node.tag) {
+      @case ('path') {
+        <svg:path [attr.d]="node.attrs['d']" [attr.fill]="node.attrs['fill']" />
+      }
+      @case ('circle') {
+        <svg:circle
+          [attr.cx]="node.attrs['cx']"
+          [attr.cy]="node.attrs['cy']"
+          [attr.r]="node.attrs['r']"
+        />
+      }
+      @case ('rect') {
+        <svg:rect
+          [attr.x]="node.attrs['x']"
+          [attr.y]="node.attrs['y']"
+          [attr.width]="node.attrs['width']"
+          [attr.height]="node.attrs['height']"
+          [attr.rx]="node.attrs['rx']"
+          [attr.ry]="node.attrs['ry']"
+        />
+      }
+      @case ('line') {
+        <svg:line
+          [attr.x1]="node.attrs['x1']"
+          [attr.x2]="node.attrs['x2']"
+          [attr.y1]="node.attrs['y1']"
+          [attr.y2]="node.attrs['y2']"
+        />
+      }
+      @case ('polyline') {
+        <svg:polyline [attr.points]="node.attrs['points']" />
+      }
+      @case ('polygon') {
+        <svg:polygon [attr.points]="node.attrs['points']" />
+      }
+      @case ('ellipse') {
+        <svg:ellipse
+          [attr.cx]="node.attrs['cx']"
+          [attr.cy]="node.attrs['cy']"
+          [attr.rx]="node.attrs['rx']"
+          [attr.ry]="node.attrs['ry']"
+        />
+      }
+    }
+  }
+</svg>

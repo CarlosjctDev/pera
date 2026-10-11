@@ -1,0 +1,37 @@
+<app-topbar
+  class="shrink-0"
+  [showSidebarToggle]="true"
+  [showTitle]="true"
+  [title]="environment.appName"
+  [initials]="initials()"
+  [avatarTip]="avatarTip()"
+  [actions]="topbarActions()"
+  (sidebarToggle)="layout.toggleOpen()"
+  (home)="layout.goHome()"
+  (actionClicked)="onAction($event)"
+/>
+
+@if (layout.sidebarOpen()) {
+  <div
+    class="fixed inset-x-0 bottom-0 top-16 z-40 bg-black/30 backdrop-blur-sm lg:hidden"
+    aria-hidden="true"
+    (click)="layout.setOpen(false)"
+  ></div>
+}
+
+<div class="flex min-h-0 flex-1">
+  <app-sidebar
+    [items]="layout.sidebarItems()"
+    [open]="layout.sidebarOpen()"
+    [collapsed]="layout.sidebarCollapsed()"
+    [filter]="layout.menuFilter()"
+    (collapsedChange)="layout.setCollapsed($event)"
+    (filterChange)="layout.setFilter($event)"
+    (itemSelected)="layout.selectItem($event)"
+    (searchRequested)="layout.openSearchDialog()"
+  />
+
+  <main class="app-main min-w-0 flex-1 overflow-y-auto overflow-x-clip">
+    <router-outlet />
+  </main>
+</div>

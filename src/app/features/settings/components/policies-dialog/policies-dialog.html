@@ -1,0 +1,70 @@
+<app-dialog-shell
+  [title]="'settings.policies.dialogTitle' | t"
+  [icon]="'security'"
+  [maxWidth]="'min(92vw, 32rem)'"
+>
+  <div class="divide-y divide-app-border rounded-2xl border border-app-border">
+    <div class="flex items-start gap-3 p-4">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-app-secondary">
+        <app-icon name="security" class="h-5 w-5 text-app-primary" />
+      </div>
+
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-semibold text-app-fg">
+          {{ 'settings.policies.privacyTitle' | t }}
+        </p>
+
+        <p class="mt-1 text-xs leading-5 text-app-muted">
+          {{ 'settings.policies.privacyDescription' | t }}
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-3 p-4">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-app-secondary">
+        <app-icon name="save" class="h-5 w-5 text-app-primary" />
+      </div>
+
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-semibold text-app-fg">
+          {{ 'settings.policies.controlTitle' | t }}
+        </p>
+
+        <p class="mt-1 text-xs leading-5 text-app-muted">
+          {{ 'settings.policies.controlDescription' | t }}
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-start gap-3 p-4">
+      <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-app-secondary">
+        <app-icon name="database" class="h-5 w-5 text-app-primary" />
+      </div>
+
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-semibold text-app-fg">
+          {{ 'settings.policies.collectTitle' | t }}
+        </p>
+
+        <p class="mt-1 text-xs leading-5 text-app-muted">
+          {{ 'settings.policies.collectDescription' | t }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 flex flex-col items-center gap-4">
+    <p class="text-center text-xs text-app-muted">
+      © {{ currentYear }} {{ environment.appName }}.
+      {{ 'settings.policies.rightsReserved' | t }}
+    </p>
+
+    <button
+      type="button"
+      (click)="close()"
+      class="w-full rounded-xl bg-app-secondary px-4 py-2.5 text-sm font-semibold text-app-secondary-fg ring-1 ring-inset ring-app-border transition hover:bg-app-secondary-hover hover:text-app-fg focus:ring-2 focus:ring-app-primary focus:outline-none"
+    >
+      {{ 'common.close' | t }}
+    </button>
+  </div>
+</app-dialog-shell>

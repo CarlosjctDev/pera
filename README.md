@@ -1,59 +1,86 @@
-# Pera
+<div align="center">
+	<img src="public/icono.png" alt="Logo de Pera" width="120" />
+	<h1>Pera</h1>
+	<p>Una aplicación personal para organizar tus finanzas desde el navegador.</p>
+</div>
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.17.
+Pera permite registrar movimientos, consultar un resumen de tus finanzas y mantener tus datos organizados en un solo lugar. La interfaz está disponible en español e inglés e incluye modo claro, oscuro y automático.
 
-## Development server
+## Funcionalidades
 
-To start a local development server, run:
+- **Panel financiero** para consultar información y movimientos.
+- **Registro de movimientos** de ingresos, gastos, ahorros, inversiones y transferencias.
+- **Cuentas y datos organizados** con categorías, contactos y tipos de relación.
+- **Movimientos programados** para gestionar recurrencias.
+- **Notas y archivos adjuntos** asociados a la información de la aplicación.
+- **Copias de seguridad** locales, exportación e importación de datos.
+- **Preferencias de idioma y tema**: español o inglés; claro, oscuro o según el sistema.
+- **Almacenamiento local** en el navegador mediante IndexedDB y Dexie.
+- **Configuración PWA** para ofrecer una experiencia instalable en navegadores compatibles.
+
+> Los datos se guardan en el navegador de este dispositivo. Usa la función de copias de seguridad antes de borrar los datos del sitio o cambiar de dispositivo.
+
+## Tecnologías
+
+- [Angular](https://angular.dev/) 21
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Angular CDK](https://material.angular.dev/cdk/categories)
+- [Dexie](https://dexie.org/) e IndexedDB
+- [Bun](https://bun.sh/) como gestor de paquetes y scripts
+
+## Requisitos
+
+- [Bun](https://bun.sh/) 1.3 o posterior.
+- Un navegador moderno con soporte para IndexedDB.
+
+## Configuración de entorno
+
+Actualmente el proyecto **no necesita un archivo `.env`**. La configuración se mantiene en los archivos de Angular:
+
+- `src/environments/environment.development.ts`: configuración usada durante el desarrollo (`bun run start`).
+- `src/environments/environment.ts`: configuración de producción, usada al compilar (`bun run build`).
+
+Ambos definen el modo de ejecución, el nombre de la aplicación y su versión; esta última se obtiene de `package.json`. Si añades servicios externos, no guardes claves secretas en estos archivos: los valores del frontend quedan incluidos en el código entregado al navegador.
+
+## Instalación y desarrollo
+
+Clona el repositorio desde GitHub y ejecuta estos comandos desde la carpeta del proyecto:
 
 ```bash
-ng serve
+bun install
+bun run start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Abre [http://localhost:4200](http://localhost:4200). El servidor de desarrollo recarga la aplicación al detectar cambios en el código.
 
-## Code scaffolding
+## Comandos disponibles
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+| Comando | Descripción |
+| --- | --- |
+| `bun run start` | Inicia el servidor de desarrollo de Angular. |
+| `bun run build` | Genera la compilación de producción en `dist/`. |
+| `bun run watch` | Compila en modo desarrollo y observa cambios. |
+| `bun run test` | Ejecuta las pruebas unitarias una vez. |
+| `bun run test:watch` | Ejecuta las pruebas y las vuelve a correr al detectar cambios. |
+
+Las pruebas usan Vitest a través del builder de pruebas de Angular. GitHub Actions ejecuta las pruebas y la compilación en cada push y pull request.
+
+## Compilación de producción
 
 ```bash
-ng generate component component-name
+bun run build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Los archivos generados se guardan en `dist/`. La configuración PWA y el service worker se incluyen en la compilación de producción.
 
-```bash
-ng generate --help
-```
+## Estructura general
 
-## Building
+- `src/app/core/`: componentes compartidos, navegación, idioma, tema y servicios comunes.
+- `src/app/features/`: funcionalidades de perfil, panel, movimientos, datos maestros, notas, archivos adjuntos y configuración.
+- `src/app/adapters/persistence/`: persistencia local y repositorios basados en Dexie.
+- `public/`: iconos y recursos públicos de la aplicación.
 
-To build the project run:
+## Contribuciones
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Las propuestas y los reportes de errores son bienvenidos. Antes de enviar cambios, ejecuta `bun run test` y `bun run build`.
