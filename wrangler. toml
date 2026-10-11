@@ -1,0 +1,6 @@
+name = "pera"
+compatibility_date = "2024-10-01"
+
+[assets]
+directory = "./dist/pera/browser"
+not_found_handling = "single-page-application"
