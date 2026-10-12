@@ -1,4 +1,4 @@
-<app-dialog-shell [title]="data.title" [icon]="'warning'">
+<app-dialog-shell [title]="data.title" [icon]="'warning'" [margin]="'0 auto'">
   <ul class="max-h-72 overflow-y-auto rounded-xl bg-red-500/10 p-3 text-sm leading-relaxed text-red-600 dark:text-red-400">
     @for (problem of data.problems; track problem) {
       <li class="flex items-start gap-2">

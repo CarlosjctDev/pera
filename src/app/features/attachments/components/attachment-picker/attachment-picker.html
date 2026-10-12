@@ -29,29 +29,37 @@
     <ul class="space-y-1.5">
       @for (file of files(); track $index) {
         <li
-          class="flex min-w-0 items-center gap-2 rounded-xl bg-app-secondary px-3 py-2"
+          class="flex min-w-0 items-start gap-2 rounded-xl bg-app-secondary px-3 py-2"
         >
-          <app-icon name="file" class="h-4 w-4 shrink-0 text-app-muted" />
-          <span class="min-w-0 flex-1 truncate text-sm">{{ file.name }}</span>
-          <span
-            class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide"
-            [class]="
-              isPdf(file.mimeType)
-                ? 'bg-red-500/10 text-red-600 dark:text-red-400'
-                : 'bg-sky-500/10 text-sky-600 dark:text-sky-400'
-            "
-          >
-            {{ (isPdf(file.mimeType) ? 'attachments.pdf' : 'attachments.image') | t }}
-          </span>
-          <span class="shrink-0 text-xs tabular-nums text-app-muted">{{ file.size | bytes }}</span>
-          <button
-            type="button"
-            (click)="remove($index)"
-            [attr.aria-label]="'attachments.remove' | t"
-            class="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-red-500/10 hover:text-red-500"
-          >
-            <app-icon name="close" class="h-3.5 w-3.5" />
-          </button>
+          <app-icon name="file" class="mt-0.5 h-4 w-4 shrink-0 text-app-muted" />
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-medium text-app-fg" [title]="file.name">
+              {{ file.name }}
+            </p>
+            <div class="mt-1.5 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex min-w-0 items-center gap-2">
+                <span
+                  class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide"
+                  [class]="
+                    isPdf(file.mimeType)
+                      ? 'bg-red-500/10 text-red-600 dark:text-red-400'
+                      : 'bg-sky-500/10 text-sky-600 dark:text-sky-400'
+                  "
+                >
+                  {{ (isPdf(file.mimeType) ? 'attachments.pdf' : 'attachments.image') | t }}
+                </span>
+                <span class="shrink-0 text-xs tabular-nums text-app-muted">{{ file.size | bytes }}</span>
+              </div>
+              <button
+                type="button"
+                (click)="remove($index)"
+                [attr.aria-label]="'attachments.remove' | t"
+                class="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-red-500/10 hover:text-red-500"
+              >
+                <app-icon name="close" class="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
         </li>
       }
     </ul>

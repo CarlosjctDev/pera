@@ -11,7 +11,7 @@ export type ImportSource = 'file' | 'backup';
   selector: 'app-import-source-dialog',
   imports: [DialogShellComponent, Icon, T],
   template: `
-    <app-dialog-shell [title]="'welcome.importTitle' | t" [icon]="'database'">
+    <app-dialog-shell [title]="'welcome.importTitle' | t" [icon]="'database'" [margin]="'0 auto'">
       <div class="flex flex-col gap-2">
         <button
           type="button"

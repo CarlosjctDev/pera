@@ -41,6 +41,20 @@
     overflow-wrap: break-word;
   }
 
+  /* El scroller real de la app es <main>, no el documento. Fijamos el alto al
+     viewport dinámico para que en móvil (Android/Xiaomi) la barra del navegador
+     no deje el layout más alto que la pantalla y el scroll se quede solo en el
+     contenido, sin arrastrar la topbar. */
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
   html.dark {
     --color-app-bg: var(--color-zinc-900);
     --color-app-fg: var(--color-zinc-100);
@@ -161,9 +175,13 @@
   margin-bottom: auto;
 }
 
+/* El contenedor ocupa todo el ancho para que el panel se centre con sus
+   márgenes automáticos (margin: 0 auto en `app-dialog-shell`), sin usar
+   flex (que provocaba desbordes en móvil). */
 .cdk-overlay-pane > .cdk-dialog-container {
-  display: flex;
-  justify-content: center;
+  display: block;
+  width: 100%;
+  min-width: 0;
 }
 
 /* Bloquea el scroll del contenido principal mientras hay un diálogo abierto
@@ -173,10 +191,18 @@ body:has(.cdk-overlay-container .cdk-dialog-container) main.app-main {
   overflow: hidden;
 }
 
-/* Reserva el espacio del scrollbar en <main> para que aparezca/desaparezca
-   sin provocar saltos de layout al abrir y cerrar diálogos. */
+/* Alto del layout = viewport visible. `dvh` sigue a la barra del navegador en
+   móvil; `vh` queda como respaldo para navegadores antiguos. */
+.app-shell {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* El scroll vive aquí: contiene su propio rebote y no se encadena al documento. */
 .app-main {
   scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* El foco automático que CDK aplica al abrir un diálogo deja el anillo

@@ -36,7 +36,8 @@ type ShellIcon =
       aria-modal="true"
       [attr.aria-label]="title()"
       [style.max-width]="maxWidth()"
-      class="dialog-in flex w-full max-w-md flex-col overflow-hidden rounded-3xl bg-app-surface/95 p-4 shadow-2xl shadow-black/10 ring-1 ring-app-border backdrop-blur sm:p-6"
+      [style.margin]="margin()"
+      class="dialog-in mx-auto flex w-full max-w-md flex-col overflow-hidden rounded-3xl bg-app-surface/95 p-4 shadow-2xl shadow-black/10 ring-1 ring-app-border backdrop-blur sm:p-6"
     >
       <header class="flex shrink-0 items-start justify-between gap-4">
         <div class="flex min-w-0 items-center gap-3">
@@ -73,6 +74,7 @@ type ShellIcon =
     `
       :host {
         display: block;
+        min-width: 0;
       }
       @keyframes dialog-in {
         from {
@@ -95,6 +97,7 @@ export class DialogShellComponent implements OnDestroy {
   readonly title = input<string>('');
   readonly icon = input<ShellIcon | ''>('');
   readonly maxWidth = input<string>('');
+  readonly margin = input<string>('0 auto');
 
   protected readonly iconName = computed<IconName | null>(() => this.icon() || null);
 

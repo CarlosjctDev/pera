@@ -18,7 +18,7 @@ const TOPBAR_ACTION_ROUTES: Readonly<Record<string, string>> = {
   selector: 'app-layout',
   imports: [RouterOutlet, Sidebar, TopbarComponent],
   host: {
-    class: 'flex h-screen flex-col',
+    class: 'app-shell flex flex-col',
   },
   templateUrl: './app.layout.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
