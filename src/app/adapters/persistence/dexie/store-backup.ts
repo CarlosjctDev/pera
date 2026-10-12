@@ -130,12 +130,13 @@ export class DexieStoreBackup implements DataStoreBackup {
           name,
         })),
         contacts: contacts.map(
-          ({ id, name, kind, gender, relationshipTypeId }): ContactSnapshot => ({
+          ({ id, name, kind, gender, relationshipTypeId, isSelf }): ContactSnapshot => ({
             id: id as number,
             name,
             kind,
             gender,
             relationshipTypeId,
+            isSelf,
           }),
         ),
         accounts: accounts.map(

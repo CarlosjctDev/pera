@@ -78,6 +78,7 @@ export interface ContactSnapshot {
   readonly kind: (typeof CONTACT_KINDS)[number];
   readonly gender: (typeof GENDERS)[number] | null;
   readonly relationshipTypeId?: number;
+  readonly isSelf?: boolean;
 }
 
 export interface AccountSnapshot {

@@ -17,6 +17,29 @@ function queryTerm(value: string | undefined): string {
   return normalizeText(value ?? '').toLowerCase();
 }
 
+function compareDueDate(a: Account, b: Account): number {
+  const left = a.dueDate;
+  const right = b.dueDate;
+
+  if (left === right) {
+    return 0;
+  }
+
+  if (left === undefined) {
+    return 1;
+  }
+
+  if (right === undefined) {
+    return -1;
+  }
+
+  return left < right ? -1 : 1;
+}
+
+function compareId(a: Account, b: Account): number {
+  return (a.id ?? 0) - (b.id ?? 0);
+}
+
 @Injectable()
 export class DexieAccountRepository implements AccountRepository {
   private readonly db = inject(AppDatabase);
@@ -98,13 +121,16 @@ export class DexieAccountRepository implements AccountRepository {
 
     const total = await collection.count();
 
-    let rows =
-      sort !== null && sort !== undefined
-        ? await collection.sortBy(sort.key)
-        : await collection.toArray();
+    let rows = await collection.toArray();
 
-    if (sort?.dir === 'desc') {
-      rows = [...rows].reverse();
+    if (sort === null || sort === undefined) {
+      rows.sort((a, b) => compareDueDate(a, b) || compareId(a, b));
+    } else if (sort.key === 'dueDate') {
+      const factor = sort.dir === 'desc' ? -1 : 1;
+      rows.sort((a, b) => (compareDueDate(a, b) || compareId(a, b)) * factor);
+    } else {
+      const factor = sort.dir === 'desc' ? -1 : 1;
+      rows.sort((a, b) => (a.amount - b.amount) * factor || compareId(a, b));
     }
 
     if (limit !== -1) {

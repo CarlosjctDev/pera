@@ -62,7 +62,9 @@ export class ContactList {
   );
 
   protected readonly contactsForKind = computed(() =>
-    this.contactService.contacts().filter((contact) => contact.kind === this.kind()),
+    this.contactService
+      .contacts()
+      .filter((contact) => contact.kind === this.kind() && contact.isSelf !== true),
   );
 
   protected readonly relationshipTypeById = computed(() => {

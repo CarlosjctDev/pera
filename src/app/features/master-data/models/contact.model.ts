@@ -8,6 +8,7 @@ export interface Contact {
   readonly kind: ContactKind;
   readonly gender: Gender | null;
   readonly relationshipTypeId?: number;
+  readonly isSelf?: boolean;
 }
 
 export type NewContact = Omit<Contact, 'id'>;

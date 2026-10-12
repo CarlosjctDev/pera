@@ -51,14 +51,17 @@ export class SavingForm {
 
   protected readonly contactOptions = computed(() => {
     const kind = this.contactKind();
+    const self = this.contactService.selfContact();
+    const options =
+      kind === null
+        ? []
+        : this.contacts()
+            .filter((contact) => contact.kind === kind && contact.isSelf !== true)
+            .map((contact) => ({ value: contact.id ?? null, label: contact.name }));
 
-    if (kind === null) {
-      return [];
-    }
-
-    return this.contacts()
-      .filter((contact) => contact.kind === kind)
-      .map((contact) => ({ value: contact.id ?? null, label: contact.name }));
+    return self?.id !== undefined
+      ? [{ value: self.id, label: self.name }, ...options]
+      : options;
   });
 
   protected readonly contacts = this.contactService.contacts;

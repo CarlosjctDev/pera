@@ -79,7 +79,6 @@
         [options]="contactOptions()"
         [placeholder]="'movements.contactPlaceholder' | t"
         [invalid]="contactError()"
-        [disabled]="contactKind() === null"
         [addTooltip]="contactSubmitLabel() | t"
         [ngModel]="contactId()"
         (ngModelChange)="onContactChange($event)"
