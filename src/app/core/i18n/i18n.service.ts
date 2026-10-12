@@ -76,10 +76,13 @@ export class I18nService {
         return stored;
       }
     } catch {
-      // Almacenamiento no disponible: se usa el idioma por defecto.
+      // Almacenamiento no disponible: se usa el idioma del navegador o el por defecto.
     }
 
-    return DEFAULT_LANGUAGE;
+    const language = this.getBrowserLanguage();
+    this.persist(language);
+
+    return language;
   }
 
   private persist(language: Language): void {
