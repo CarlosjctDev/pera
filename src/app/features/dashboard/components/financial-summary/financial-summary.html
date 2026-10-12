@@ -83,6 +83,12 @@
           </dd>
         </div>
         <div class="flex min-w-0 items-center justify-between gap-2 rounded-xl bg-app-secondary px-3 py-2.5">
+          <dt class="shrink-0 text-xs font-medium text-app-muted">{{ 'dashboard.summary.saving' | t }}</dt>
+          <dd class="min-w-0 text-right text-sm font-bold leading-tight tabular-nums break-words text-amber-600 dark:text-amber-400">
+            {{ monthSaving() | i18nCurrency: profile.currency() }}
+          </dd>
+        </div>
+        <div class="flex min-w-0 items-center justify-between gap-2 rounded-xl bg-app-secondary px-3 py-2.5">
           <dt class="shrink-0 text-xs font-medium text-app-muted">{{ 'dashboard.summary.balance' | t }}</dt>
           <dd
             class="min-w-0 text-right text-sm font-bold leading-tight tabular-nums break-words"
@@ -113,6 +119,12 @@
           <dt class="shrink-0 text-xs font-medium text-app-muted">{{ 'dashboard.summary.expense' | t }}</dt>
           <dd class="min-w-0 text-right text-sm font-bold leading-tight tabular-nums break-words text-red-600 dark:text-red-400">
             {{ yearExpense() | i18nCurrency: profile.currency() }}
+          </dd>
+        </div>
+        <div class="flex min-w-0 items-center justify-between gap-2 rounded-xl bg-app-secondary px-3 py-2.5">
+          <dt class="shrink-0 text-xs font-medium text-app-muted">{{ 'dashboard.summary.saving' | t }}</dt>
+          <dd class="min-w-0 text-right text-sm font-bold leading-tight tabular-nums break-words text-amber-600 dark:text-amber-400">
+            {{ yearSaving() | i18nCurrency: profile.currency() }}
           </dd>
         </div>
         <div class="flex min-w-0 items-center justify-between gap-2 rounded-xl bg-app-secondary px-3 py-2.5">

@@ -10,6 +10,7 @@ import { TransactionService } from '@app/features/transactions/services/transact
 
 import { DashboardPeriodService } from '../../services/dashboard-period.service';
 
+import type { TransactionType } from '@app/features/transactions/models/transaction-type.model';
 import type { AccountType } from '@app/features/transactions/models/account.model';
 
 @Component({
@@ -35,7 +36,12 @@ export class FinancialSummary implements OnInit {
   protected readonly monthExpense = computed(() =>
     this.totalByType('expense', (date) => this.inSelectedMonth(date)),
   );
-  protected readonly monthBalance = computed(() => this.monthIncome() - this.monthExpense());
+  protected readonly monthSaving = computed(() =>
+    this.totalByType('saving', (date) => this.inSelectedMonth(date)),
+  );
+  protected readonly monthBalance = computed(() =>
+    this.monthIncome() - this.monthExpense() + this.monthSaving(),
+  );
 
   protected readonly yearIncome = computed(() =>
     this.totalByType('income', (date) => this.inSelectedYear(date)),
@@ -43,7 +49,12 @@ export class FinancialSummary implements OnInit {
   protected readonly yearExpense = computed(() =>
     this.totalByType('expense', (date) => this.inSelectedYear(date)),
   );
-  protected readonly yearBalance = computed(() => this.yearIncome() - this.yearExpense());
+  protected readonly yearSaving = computed(() =>
+    this.totalByType('saving', (date) => this.inSelectedYear(date)),
+  );
+  protected readonly yearBalance = computed(() =>
+    this.yearIncome() - this.yearExpense() + this.yearSaving(),
+  );
 
   protected readonly pendingReceivable = computed(() => this.pendingTotal('receivable'));
   protected readonly pendingPayable = computed(() => this.pendingTotal('payable'));
@@ -64,7 +75,7 @@ export class FinancialSummary implements OnInit {
     return date.getFullYear() === this.period.selectedYear();
   }
 
-  private totalByType(type: 'income' | 'expense', within: (date: Date) => boolean): number {
+  private totalByType(type: TransactionType, within: (date: Date) => boolean): number {
     return this.transactionService
       .transactions()
       .filter((transaction) => transaction.type === type && within(transaction.date))
