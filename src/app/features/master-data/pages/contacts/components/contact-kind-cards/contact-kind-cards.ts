@@ -7,9 +7,8 @@ import { T } from '@app/core/i18n/pipes/t.pipe';
 import { estimateBytes } from '@app/core/utils/size.utils';
 import { ContactService } from '@app/features/master-data/services/contact.service';
 
+import type { ContactKind } from '@app/features/master-data/models/contact-kind.model';
 import type { TranslationKey } from '@app/core/i18n/i18n.keys';
-
-type ContactKind = 'person' | 'company';
 
 @Component({
   selector: 'app-contact-kind-cards',
@@ -22,28 +21,22 @@ export class ContactKindCards {
 
   @Output() readonly select = new EventEmitter<ContactKind>();
 
-  protected readonly kinds: readonly ContactKind[] = ['person', 'company'];
+  protected readonly kinds: readonly ContactKind[] = ['person', 'company', 'pet'];
 
   protected kindKindDescription(kind: ContactKind): TranslationKey {
     return `contacts.kindDescription.${kind}` as TranslationKey;
   }
 
   protected kindCount(kind: ContactKind): number {
-    return this.contactService
-      .contacts()
-      .filter((contact) => contact.isCompany === (kind === 'company')).length;
+    return this.contactService.contacts().filter((contact) => contact.kind === kind).length;
   }
 
   protected kindSize(kind: ContactKind): number {
-    return estimateBytes(
-      this.contactService
-        .contacts()
-        .filter((contact) => contact.isCompany === (kind === 'company')),
-    );
+    return estimateBytes(this.contactService.contacts().filter((contact) => contact.kind === kind));
   }
 
   protected kindIcon(kind: ContactKind): IconName {
-    return kind === 'company' ? 'users' : 'user';
+    return kind === 'company' ? 'users' : kind === 'pet' ? 'paw' : 'user';
   }
 
   protected kindLabel(kind: ContactKind): TranslationKey {

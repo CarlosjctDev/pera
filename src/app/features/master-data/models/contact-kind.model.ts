@@ -1,1 +1,1 @@
-export type ContactKind = 'person' | 'company';
+export type ContactKind = 'person' | 'company' | 'pet';

@@ -60,7 +60,7 @@ const SNAPSHOT_PROBLEM_KEYS: Record<SnapshotProblemCode, TranslationKey> = {
   invalidStartDate: 'settings.data.importProblems.invalidStartDate',
   invalidNextDate: 'settings.data.importProblems.invalidNextDate',
   invalidActive: 'settings.data.importProblems.invalidActive',
-  invalidIsCompany: 'settings.data.importProblems.invalidIsCompany',
+  invalidKind: 'settings.data.importProblems.invalidKind',
   invalidGender: 'settings.data.importProblems.invalidGender',
   invalidRelationshipType: 'settings.data.importProblems.invalidRelationshipType',
   invalidCurrency: 'settings.data.importProblems.invalidCurrency',

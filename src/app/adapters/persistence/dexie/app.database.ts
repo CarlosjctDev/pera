@@ -86,5 +86,29 @@ export class AppDatabase extends Dexie {
       attachments: '++id, ownerId',
       notes: '++id, ownerId, date',
     });
+
+    this.version(8)
+      .stores({
+        profiles: '++id, name, createdAt',
+        categories: '++id, type',
+        transactions: '++id, type, categoryId, date, contactId',
+        relationshipTypes: '++id',
+        contacts: '++id, name',
+        accounts: '++id, type',
+        scheduledMovements: '++id, nextDate',
+        attachments: '++id, ownerId',
+        notes: '++id, ownerId, date',
+      })
+      .upgrade((tx) =>
+        tx
+          .table('contacts')
+          .toCollection()
+          .modify((contact: { isCompany?: boolean; kind?: string }) => {
+            if (contact.kind === undefined) {
+              contact.kind = contact.isCompany === true ? 'company' : 'person';
+            }
+            delete contact.isCompany;
+          }),
+      );
   }
 }
