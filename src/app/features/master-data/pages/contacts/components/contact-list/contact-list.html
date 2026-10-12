@@ -13,7 +13,7 @@
       class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-app-secondary text-app-secondary-fg"
       aria-hidden="true"
     >
-      <app-icon [name]="kindIcon(contact.isCompany ? 'company' : 'person')" class="h-3.5 w-3.5" />
+      <app-icon [name]="kindIcon(contact.kind)" class="h-3.5 w-3.5" />
     </span>
     <span class="truncate text-sm font-medium">{{ contact.name }}</span>
   </div>
@@ -21,12 +21,12 @@
 
 <ng-template #kindCell let-contact>
   <span class="text-app-muted">
-    {{ kindLabel(contact.isCompany ? 'company' : 'person') | t }}
+    {{ kindLabel(contact.kind) | t }}
   </span>
 </ng-template>
 
 <ng-template #genderCell let-contact>
-  @if (!contact.isCompany && genderLabel(contact.gender)) {
+  @if (contact.kind === 'person' && genderLabel(contact.gender)) {
     <span class="text-app-muted">{{ genderLabel(contact.gender) | t }}</span>
   } @else {
     <span class="text-app-muted">—</span>
@@ -65,6 +65,10 @@
       <button type="button" (click)="selectEditKind('company')" [class]="editKindClass('company')">
         <app-icon name="users" class="h-3 w-3" />
         <span>{{ 'contacts.kind.company' | t }}</span>
+      </button>
+      <button type="button" (click)="selectEditKind('pet')" [class]="editKindClass('pet')">
+        <app-icon name="paw" class="h-3 w-3" />
+        <span>{{ 'contacts.kind.pet' | t }}</span>
       </button>
     </div>
 
@@ -107,8 +111,10 @@
         [searchable]="false"
         [options]="relationshipOptions()"
         [placeholder]="'contacts.relationshipPlaceholder' | t"
+        [addTooltip]="'relationships.submit' | t"
         [ngModel]="editRelationshipTypeId()"
         (ngModelChange)="onEditRelationshipChange($event)"
+        (add)="addRelationshipType()"
       />
     </div>
 

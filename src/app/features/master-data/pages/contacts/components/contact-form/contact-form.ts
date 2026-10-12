@@ -1,5 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Dialog } from '@angular/cdk/dialog';
+import { firstValueFrom } from 'rxjs';
 
 import { Icon } from '@app/core/components/icons/icon.component';
 import { SelectComponent } from '@app/core/components/select/select.component';
@@ -9,8 +19,11 @@ import { normalizeText } from '@app/core/utils/text.utils';
 import { ContactService } from '@app/features/master-data/services/contact.service';
 import { RelationshipTypeService } from '@app/features/master-data/services/relationship-type.service';
 
+import { RelationshipFormDialogComponent } from '@app/features/master-data/pages/relationships/components/relationship-form-dialog/relationship-form-dialog';
+
 import type { ContactKind } from '@app/features/master-data/models/contact-kind.model';
-import type { Gender } from '@app/features/master-data/models/contact.model';
+import type { Contact, Gender } from '@app/features/master-data/models/contact.model';
+import type { RelationshipType } from '@app/features/master-data/models/relationship-type.model';
 import type { TranslationKey } from '@app/core/i18n/i18n.keys';
 
 const GENDERS: readonly Gender[] = ['male', 'female', 'non_binary', 'prefer_not_to_say', 'other'];
@@ -24,9 +37,12 @@ const GENDERS: readonly Gender[] = ['male', 'female', 'non_binary', 'prefer_not_
 export class ContactForm {
   private readonly contactService = inject(ContactService);
   private readonly relationshipTypeService = inject(RelationshipTypeService);
+  private readonly dialog = inject(Dialog);
   private readonly toastr = inject(ToastrService);
 
   readonly kind = input.required<ContactKind>();
+
+  readonly saved = output<Contact>();
 
   protected readonly relationshipTypes = this.relationshipTypeService.relationshipTypes;
   protected readonly genders: readonly Gender[] = GENDERS;
@@ -45,6 +61,10 @@ export class ContactForm {
 
   protected readonly isPerson = computed(() => this.kind() === 'person');
 
+  protected submitLabel(): TranslationKey {
+    return `contacts.submit.${this.kind()}` as TranslationKey;
+  }
+
   protected selectGender(gender: Gender): void {
     this.gender.set(gender);
     this.genderError.set(false);
@@ -52,6 +72,16 @@ export class ContactForm {
 
   protected onRelationshipChange(value: number | null): void {
     this.relationshipTypeId.set(typeof value === 'number' ? value : null);
+  }
+
+  protected async addRelationshipType(): Promise<void> {
+    const relationshipType = await firstValueFrom(
+      this.dialog.open<RelationshipType | undefined>(RelationshipFormDialogComponent).closed,
+    );
+
+    if (relationshipType?.id !== undefined) {
+      this.relationshipTypeId.set(relationshipType.id);
+    }
   }
 
   protected genderClass(gender: Gender): string {
@@ -80,15 +110,16 @@ export class ContactForm {
     this.saving.set(true);
 
     try {
-      await this.contactService.create({
+      const contact = await this.contactService.create({
         name,
-        isCompany: this.kind() === 'company',
+        kind: this.kind(),
         gender,
         relationshipTypeId: this.relationshipTypeId() ?? undefined,
       });
       this.name.set('');
       this.gender.set(null);
       this.relationshipTypeId.set(null);
+      this.saved.emit(contact);
       this.toastr.success('toasts.saved');
     } catch {
       this.toastr.error('toasts.saveError');

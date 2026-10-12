@@ -32,6 +32,7 @@ import { NoteService } from '@app/features/notes/services/note.service';
 import { currencySymbol } from '@app/features/profile/models/currency.model';
 import { ProfileService } from '@app/features/profile/services/profile.service';
 import { ContactService } from '@app/features/master-data/services/contact.service';
+import { MasterDataDialogsService } from '@app/features/master-data/services/master-data-dialogs.service';
 import { ScheduleFields } from '@app/features/transactions/components/schedule-fields/schedule-fields';
 import { AccountService } from '@app/features/transactions/services/account.service';
 import { CategoryService } from '@app/features/transactions/services/category.service';
@@ -43,6 +44,7 @@ import { AttachmentService } from '@app/features/attachments/services/attachment
 
 import type { Account, AccountType } from '@app/features/transactions/models/account.model';
 import type { Contact } from '@app/features/master-data/models/contact.model';
+import type { ContactKind } from '@app/features/master-data/models/contact-kind.model';
 
 const DEFAULT_QUERY: DataTableQuery = {
   page: 0,
@@ -77,6 +79,7 @@ export class Accounts {
   private readonly accountService = inject(AccountService);
   private readonly scheduledMovementService = inject(ScheduledMovementService);
   private readonly contactService = inject(ContactService);
+  private readonly masterDialogs = inject(MasterDataDialogsService);
   private readonly categoryService = inject(CategoryService);
   private readonly attachmentService = inject(AttachmentService);
   private readonly noteService = inject(NoteService);
@@ -89,9 +92,17 @@ export class Accounts {
   protected readonly contacts = this.contactService.contacts;
   protected readonly categories = this.categoryService.categories;
 
-  protected readonly contactOptions = computed(() =>
-    this.contacts().map((contact) => ({ value: contact.id ?? null, label: contact.name })),
-  );
+  protected readonly contactOptions = computed(() => {
+    const kind = this.contactKind();
+
+    if (kind === null) {
+      return [];
+    }
+
+    return this.contacts()
+      .filter((contact) => contact.kind === kind)
+      .map((contact) => ({ value: contact.id ?? null, label: contact.name }));
+  });
 
   protected readonly categoryOptions = computed(() =>
     this.categories().map((category) => ({ value: category.id ?? null, label: category.name })),
@@ -189,6 +200,7 @@ export class Accounts {
   });
 
   protected readonly contactId = signal<number | null>(null);
+  protected readonly contactKind = signal<ContactKind | null>(null);
   protected readonly categoryId = signal<number | null>(null);
   protected readonly amount = signal<number | null>(null);
   protected readonly concept = signal('');
@@ -214,6 +226,12 @@ export class Accounts {
     return this.accountType() === 'receivable'
       ? 'accounts.receivableTitle'
       : 'accounts.payableTitle';
+  }
+
+  protected submitKey(): TranslationKey {
+    return this.accountType() === 'receivable'
+      ? 'accounts.submit.receivable'
+      : 'accounts.submit.payable';
   }
 
   protected onTableQuery(query: DataTableQuery): void {
@@ -253,6 +271,22 @@ export class Accounts {
     this.contactError.set(false);
   }
 
+  protected setContactKind(kind: ContactKind): void {
+    if (this.contactKind() === kind) {
+      return;
+    }
+
+    this.contactKind.set(kind);
+    this.contactId.set(null);
+    this.contactError.set(false);
+  }
+
+  protected contactKindClass(kind: ContactKind): string {
+    return this.contactKind() === kind
+      ? 'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-app-primary px-3 py-2 text-sm font-semibold text-app-primary-fg transition'
+      : 'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-app-secondary px-3 py-2 text-sm font-semibold text-app-secondary-fg transition hover:bg-app-secondary-hover';
+  }
+
   protected onCategoryChange(value: number | null): void {
     this.categoryId.set(typeof value === 'number' ? value : null);
     this.categoryError.set(false);
@@ -261,6 +295,36 @@ export class Accounts {
   protected onAmountChange(value: number | null): void {
     this.amount.set(typeof value === 'number' && !Number.isNaN(value) ? value : null);
     this.amountError.set(false);
+  }
+
+  protected contactSubmitLabel(): TranslationKey {
+    const kind = this.contactKind();
+
+    return kind === null ? ('' as TranslationKey) : (`contacts.submit.${kind}` as TranslationKey);
+  }
+
+  protected async addCategory(): Promise<void> {
+    const category = await this.masterDialogs.addCategory();
+
+    if (category?.id !== undefined) {
+      this.categoryId.set(category.id);
+      this.categoryError.set(false);
+    }
+  }
+
+  protected async addContact(): Promise<void> {
+    const kind = this.contactKind();
+
+    if (kind === null) {
+      return;
+    }
+
+    const contact = await this.masterDialogs.addContact(kind);
+
+    if (contact?.id !== undefined) {
+      this.contactId.set(contact.id);
+      this.contactError.set(false);
+    }
   }
 
   protected async add(): Promise<void> {
@@ -319,6 +383,7 @@ export class Accounts {
 
       this.attachments().clear();
       this.contactId.set(null);
+      this.contactKind.set(null);
       this.categoryId.set(null);
       this.amount.set(null);
       this.concept.set('');

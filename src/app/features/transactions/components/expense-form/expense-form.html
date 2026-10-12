@@ -35,8 +35,10 @@
         [options]="categoryOptions()"
         [placeholder]="'movements.categoryPlaceholder' | t"
         [invalid]="categoryError()"
+        [addTooltip]="'categories.submit' | t"
         [ngModel]="categoryId()"
         (ngModelChange)="onCategoryChange($event)"
+        (add)="addCategory()"
       />
       @if (categoryError()) {
         <p class="text-xs text-red-500" role="alert">{{ 'movements.errors.category' | t }}</p>
@@ -47,18 +49,41 @@
   </div>
 
   @if (showContactPicker) {
-    <div class="space-y-1">
-      <label class="text-sm font-medium" for="contact">
-        {{ 'movements.contact' | t }}
-      </label>
+    <div class="space-y-2">
+      <span class="text-sm font-medium">{{ 'movements.contact' | t }}</span>
+      <div class="flex gap-2">
+        <button
+          type="button"
+          (click)="setContactKind('person')"
+          [class]="contactKindClass('person')"
+        >
+          <app-icon name="user" class="h-4 w-4" />
+          <span>{{ 'contacts.kind.person' | t }}</span>
+        </button>
+        <button
+          type="button"
+          (click)="setContactKind('company')"
+          [class]="contactKindClass('company')"
+        >
+          <app-icon name="users" class="h-4 w-4" />
+          <span>{{ 'contacts.kind.company' | t }}</span>
+        </button>
+        <button type="button" (click)="setContactKind('pet')" [class]="contactKindClass('pet')">
+          <app-icon name="paw" class="h-4 w-4" />
+          <span>{{ 'contacts.kind.pet' | t }}</span>
+        </button>
+      </div>
       <app-select
         id="contact"
         name="contact"
         [options]="contactOptions()"
         [placeholder]="'movements.contactPlaceholder' | t"
         [invalid]="contactError()"
+        [disabled]="contactKind() === null"
+        [addTooltip]="contactSubmitLabel() | t"
         [ngModel]="contactId()"
         (ngModelChange)="onContactChange($event)"
+        (add)="addContact()"
       />
       @if (contactError()) {
         <p class="text-xs text-red-500" role="alert">{{ 'movements.errors.contact' | t }}</p>
@@ -118,6 +143,6 @@
       <app-icon name="plus" class="h-4 w-4" />
     }
 
-    {{ (saving() ? 'common.loading' : 'movements.submit') | t }}
+    {{ (saving() ? 'common.loading' : 'movements.submit.expense') | t }}
   </button>
 </form>

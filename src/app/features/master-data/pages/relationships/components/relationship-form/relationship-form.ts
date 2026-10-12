@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Icon } from '@app/core/components/icons/icon.component';
@@ -6,6 +6,8 @@ import { ToastrService } from '@app/core/components/toastr/toastr';
 import { T } from '@app/core/i18n/pipes/t.pipe';
 import { normalizeText } from '@app/core/utils/text.utils';
 import { RelationshipTypeService } from '@app/features/master-data/services/relationship-type.service';
+
+import type { RelationshipType } from '@app/features/master-data/models/relationship-type.model';
 
 @Component({
   selector: 'app-relationship-form',
@@ -16,6 +18,8 @@ import { RelationshipTypeService } from '@app/features/master-data/services/rela
 export class RelationshipForm {
   private readonly relationshipTypeService = inject(RelationshipTypeService);
   private readonly toastr = inject(ToastrService);
+
+  readonly saved = output<RelationshipType>();
 
   protected readonly name = signal('');
   protected readonly nameError = signal(false);
@@ -36,8 +40,9 @@ export class RelationshipForm {
     this.saving.set(true);
 
     try {
-      await this.relationshipTypeService.create({ name });
+      const relationshipType = await this.relationshipTypeService.create({ name });
       this.name.set('');
+      this.saved.emit(relationshipType);
       this.toastr.success('toasts.saved');
     } catch {
       this.toastr.error('toasts.saveError');

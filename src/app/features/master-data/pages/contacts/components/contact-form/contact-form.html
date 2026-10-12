@@ -51,8 +51,10 @@
         name="contact-relationship-type"
         [options]="relationshipOptions()"
         [placeholder]="'contacts.relationshipPlaceholder' | t"
+        [addTooltip]="'relationships.submit' | t"
         [ngModel]="relationshipTypeId()"
         (ngModelChange)="onRelationshipChange($event)"
+        (add)="addRelationshipType()"
       />
     </div>
   </div>
@@ -68,6 +70,6 @@
       <app-icon name="plus" class="h-4 w-4" />
     }
 
-    {{ (saving() ? 'common.loading' : 'contacts.submit') | t }}
+    {{ (saving() ? 'common.loading' : submitLabel()) | t }}
   </button>
 </form>

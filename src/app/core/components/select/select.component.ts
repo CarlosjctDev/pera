@@ -6,12 +6,14 @@ import {
   computed,
   forwardRef,
   input,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Icon } from '@app/core/components/icons/icon.component';
+import { TippyDirective } from '@app/core/directives/tippy.directive';
 import { T } from '@app/core/i18n/pipes/t.pipe';
 import { normalizeText } from '@app/core/utils/text.utils';
 
@@ -31,7 +33,7 @@ const POSITIONS: ConnectedPosition[] = [
 
 @Component({
   selector: 'app-select',
-  imports: [Icon, OverlayModule, T],
+  imports: [Icon, OverlayModule, TippyDirective, T],
   templateUrl: './select.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -53,6 +55,10 @@ export class SelectComponent implements ControlValueAccessor {
   readonly invalid = input(false);
   readonly disabled = input(false);
   readonly id = input('');
+  readonly addTooltip = input('');
+  readonly maxOptions = input(20);
+
+  readonly add = output<void>();
 
   protected readonly open = signal(false);
   protected readonly query = signal('');
@@ -80,16 +86,42 @@ export class SelectComponent implements ControlValueAccessor {
       return this.options();
     }
 
-    return this.options().filter((option) =>
-      normalizeText(option.label).toLowerCase().includes(query),
-    );
+    return this.options()
+      .map((option) => {
+        const label = normalizeText(option.label).toLowerCase();
+        return { option, label, index: label.indexOf(query) };
+      })
+      .filter((entry) => entry.index !== -1)
+      .sort(
+        (a, b) =>
+          this.matchRank(a.label, query) - this.matchRank(b.label, query) ||
+          a.index - b.index ||
+          a.label.localeCompare(b.label),
+      )
+      .map((entry) => entry.option);
   });
+
+  protected readonly visibleOptions = computed(() =>
+    this.filteredOptions().slice(0, this.maxOptions()),
+  );
 
   private readonly trigger = viewChild<ElementRef<HTMLElement>>('trigger');
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
 
   private notifyChange: (value: SelectValue) => void = () => {};
   private notifyTouched: () => void = () => {};
+
+  private matchRank(label: string, query: string): number {
+    if (label.startsWith(query)) {
+      return 0;
+    }
+
+    if (label.split(' ').some((word) => word.startsWith(query))) {
+      return 1;
+    }
+
+    return 2;
+  }
 
   writeValue(value: SelectValue): void {
     this.selectedValue.set(value ?? null);
@@ -134,7 +166,7 @@ export class SelectComponent implements ControlValueAccessor {
     this.activeIndex.set(
       Math.max(
         0,
-        this.options().findIndex((option) => option.value === this.selectedValue()),
+        this.visibleOptions().findIndex((option) => option.value === this.selectedValue()),
       ),
     );
     this.triggerWidth.set(this.trigger()?.nativeElement.offsetWidth ?? 0);
@@ -205,7 +237,7 @@ export class SelectComponent implements ControlValueAccessor {
   }
 
   private onPanelKeydown(event: KeyboardEvent): void {
-    const options = this.filteredOptions();
+    const options = this.visibleOptions();
 
     switch (event.key) {
       case 'ArrowDown':
@@ -270,11 +302,20 @@ export class SelectComponent implements ControlValueAccessor {
 
   protected triggerClasses(): string {
     return [
-      'flex w-full items-center justify-between gap-2 rounded-xl bg-app-secondary/50 text-app-fg',
+      'flex min-w-0 flex-1 items-center justify-between gap-2 rounded-xl bg-app-secondary/50 text-app-fg',
       'ring-1 ring-inset ring-app-border transition',
       'focus:outline-none focus:ring-2 focus:ring-app-primary',
       'disabled:cursor-not-allowed disabled:opacity-50',
       this.size() === 'sm' ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm',
+    ].join(' ');
+  }
+
+  protected addButtonClasses(): string {
+    return [
+      'flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-app-secondary/50 text-app-muted',
+      'ring-1 ring-inset ring-app-border transition hover:bg-app-secondary-hover hover:text-app-fg',
+      'focus:outline-none focus:ring-2 focus:ring-app-primary',
+      this.size() === 'sm' ? 'w-8' : 'w-11',
     ].join(' ');
   }
 

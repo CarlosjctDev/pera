@@ -10,12 +10,16 @@ import { normalizeText } from '@app/core/utils/text.utils';
 import { currencySymbol } from '@app/features/profile/models/currency.model';
 import { ProfileService } from '@app/features/profile/services/profile.service';
 import { ContactService } from '@app/features/master-data/services/contact.service';
+import { MasterDataDialogsService } from '@app/features/master-data/services/master-data-dialogs.service';
 import { CategoryService } from '@app/features/transactions/services/category.service';
 import { ScheduleFields } from '@app/features/transactions/components/schedule-fields/schedule-fields';
 import { ScheduledMovementService } from '@app/features/transactions/services/scheduled-movement.service';
 import { TransactionService } from '@app/features/transactions/services/transaction.service';
 import { AttachmentPicker } from '@app/features/attachments/components/attachment-picker/attachment-picker';
 import { AttachmentService } from '@app/features/attachments/services/attachment.service';
+
+import type { TranslationKey } from '@app/core/i18n/i18n.keys';
+import type { ContactKind } from '@app/features/master-data/models/contact-kind.model';
 
 @Component({
   selector: 'app-expense-form',
@@ -26,6 +30,7 @@ import { AttachmentService } from '@app/features/attachments/services/attachment
 export class ExpenseForm {
   private readonly profile = inject(ProfileService);
   private readonly contactService = inject(ContactService);
+  private readonly masterDialogs = inject(MasterDataDialogsService);
   private readonly categoryService = inject(CategoryService);
   private readonly transactionService = inject(TransactionService);
   private readonly scheduledMovementService = inject(ScheduledMovementService);
@@ -45,15 +50,24 @@ export class ExpenseForm {
     this.categories().map((category) => ({ value: category.id ?? null, label: category.name })),
   );
 
-  protected readonly contactOptions = computed(() =>
-    this.contacts().map((contact) => ({ value: contact.id ?? null, label: contact.name })),
-  );
+  protected readonly contactOptions = computed(() => {
+    const kind = this.contactKind();
+
+    if (kind === null) {
+      return [];
+    }
+
+    return this.contacts()
+      .filter((contact) => contact.kind === kind)
+      .map((contact) => ({ value: contact.id ?? null, label: contact.name }));
+  });
 
   protected readonly showContactPicker = true;
 
   protected readonly amount = signal<number | null>(null);
   protected readonly categoryId = signal<number | null>(null);
   protected readonly contactId = signal<number | null>(null);
+  protected readonly contactKind = signal<ContactKind | null>(null);
   protected readonly concept = signal('');
   protected readonly date = signal(this.todayString());
   protected readonly amountError = signal(false);
@@ -74,6 +88,52 @@ export class ExpenseForm {
   protected onContactChange(value: number | null): void {
     this.contactId.set(typeof value === 'number' ? value : null);
     this.contactError.set(false);
+  }
+
+  protected setContactKind(kind: ContactKind): void {
+    if (this.contactKind() === kind) {
+      return;
+    }
+
+    this.contactKind.set(kind);
+    this.contactId.set(null);
+    this.contactError.set(false);
+  }
+
+  protected contactKindClass(kind: ContactKind): string {
+    return this.contactKind() === kind
+      ? 'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-app-primary px-3 py-2 text-sm font-semibold text-app-primary-fg transition'
+      : 'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-app-secondary px-3 py-2 text-sm font-semibold text-app-secondary-fg transition hover:bg-app-secondary-hover';
+  }
+
+  protected contactSubmitLabel(): TranslationKey {
+    const kind = this.contactKind();
+
+    return kind === null ? ('' as TranslationKey) : (`contacts.submit.${kind}` as TranslationKey);
+  }
+
+  protected async addCategory(): Promise<void> {
+    const category = await this.masterDialogs.addCategory();
+
+    if (category?.id !== undefined) {
+      this.categoryId.set(category.id);
+      this.categoryError.set(false);
+    }
+  }
+
+  protected async addContact(): Promise<void> {
+    const kind = this.contactKind();
+
+    if (kind === null) {
+      return;
+    }
+
+    const contact = await this.masterDialogs.addContact(kind);
+
+    if (contact?.id !== undefined) {
+      this.contactId.set(contact.id);
+      this.contactError.set(false);
+    }
   }
 
   protected async submit(): Promise<void> {
@@ -126,6 +186,7 @@ export class ExpenseForm {
       this.amount.set(null);
       this.categoryId.set(null);
       this.contactId.set(null);
+      this.contactKind.set(null);
       this.concept.set('');
       this.date.set(this.todayString());
       schedule.reset();

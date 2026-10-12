@@ -25,6 +25,7 @@ import { T } from '@app/core/i18n/pipes/t.pipe';
 import { normalizeText } from '@app/core/utils/text.utils';
 import { AccountService } from '@app/features/transactions/services/account.service';
 import { ContactService } from '@app/features/master-data/services/contact.service';
+import { MasterDataDialogsService } from '@app/features/master-data/services/master-data-dialogs.service';
 import { RelationshipTypeService } from '@app/features/master-data/services/relationship-type.service';
 import { TransactionService } from '@app/features/transactions/services/transaction.service';
 
@@ -45,6 +46,7 @@ export class ContactList {
   private readonly i18n = inject(I18nService);
   private readonly contactService = inject(ContactService);
   private readonly relationshipTypeService = inject(RelationshipTypeService);
+  private readonly masterDialogs = inject(MasterDataDialogsService);
   private readonly transactionService = inject(TransactionService);
   private readonly accountService = inject(AccountService);
   private readonly toastr = inject(ToastrService);
@@ -59,13 +61,9 @@ export class ContactList {
     this.relationshipTypes().map((type) => ({ value: type.id ?? null, label: type.name })),
   );
 
-  protected readonly contactsForKind = computed(() => {
-    const kind = this.kind();
-
-    return this.contactService
-      .contacts()
-      .filter((contact) => contact.isCompany === (kind === 'company'));
-  });
+  protected readonly contactsForKind = computed(() =>
+    this.contactService.contacts().filter((contact) => contact.kind === this.kind()),
+  );
 
   protected readonly relationshipTypeById = computed(() => {
     const map = new Map<number, RelationshipType>();
@@ -154,7 +152,7 @@ export class ContactList {
 
     this.editingId.set(contact.id);
     this.editName.set(contact.name);
-    this.editKind.set(contact.isCompany ? 'company' : 'person');
+    this.editKind.set(contact.kind);
     this.editGender.set(contact.gender ?? null);
     this.editRelationshipTypeId.set(contact.relationshipTypeId ?? null);
     this.editDuplicate.set(false);
@@ -189,7 +187,7 @@ export class ContactList {
     await this.contactService.update({
       id: contact.id,
       name,
-      isCompany: this.editKind() === 'company',
+      kind: this.editKind(),
       gender,
       relationshipTypeId: this.editRelationshipTypeId() ?? undefined,
     });
@@ -211,7 +209,7 @@ export class ContactList {
   protected selectEditKind(kind: ContactKind): void {
     this.editKind.set(kind);
 
-    if (kind === 'company') {
+    if (kind !== 'person') {
       this.editGender.set(null);
       this.editGenderError.set(false);
     }
@@ -224,6 +222,14 @@ export class ContactList {
 
   protected onEditRelationshipChange(value: number | null): void {
     this.editRelationshipTypeId.set(typeof value === 'number' ? value : null);
+  }
+
+  protected async addRelationshipType(): Promise<void> {
+    const relationshipType = await this.masterDialogs.addRelationshipType();
+
+    if (relationshipType?.id !== undefined) {
+      this.editRelationshipTypeId.set(relationshipType.id);
+    }
   }
 
   protected confirmDelete(contact: Contact): void {
@@ -292,7 +298,7 @@ export class ContactList {
   }
 
   protected kindIcon(kind: ContactKind): IconName {
-    return kind === 'company' ? 'users' : 'user';
+    return kind === 'company' ? 'users' : kind === 'pet' ? 'paw' : 'user';
   }
 
   private nameExists(name: string, excludeId?: number): boolean {
