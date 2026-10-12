@@ -14,7 +14,7 @@ export class DexieRelationshipTypeRepository implements RelationshipTypeReposito
   private readonly db = inject(AppDatabase);
 
   async list(): Promise<readonly RelationshipType[]> {
-    return this.db.relationshipTypes.toArray();
+    return this.db.relationshipTypes.reverse().toArray();
   }
 
   async add(newRelationshipType: NewRelationshipType): Promise<RelationshipType> {

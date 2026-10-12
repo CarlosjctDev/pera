@@ -14,7 +14,7 @@ export class DexieContactRepository implements ContactRepository {
   private readonly db = inject(AppDatabase);
 
   async list(): Promise<readonly Contact[]> {
-    return this.db.contacts.toArray();
+    return this.db.contacts.reverse().toArray();
   }
 
   async add(newContact: NewContact): Promise<Contact> {

@@ -139,12 +139,12 @@ export class DexieTransactionRepository implements TransactionRepository {
 
     const total = await collection.count();
 
-    let rows =
-      sort !== null && sort !== undefined
-        ? await collection.sortBy(sort.key)
-        : await collection.toArray();
+    const effectiveSort =
+      sort !== null && sort !== undefined ? sort : { key: 'date', dir: 'desc' };
 
-    if (sort?.dir === 'desc') {
+    let rows = await collection.sortBy(effectiveSort.key);
+
+    if (effectiveSort.dir === 'desc') {
       rows = [...rows].reverse();
     }
 

@@ -11,7 +11,7 @@ export class DexieCategoryRepository implements CategoryRepository {
   private readonly db = inject(AppDatabase);
 
   async list(): Promise<readonly Category[]> {
-    return this.db.categories.toArray();
+    return this.db.categories.reverse().toArray();
   }
 
   async add(newCategory: NewCategory): Promise<Category> {
