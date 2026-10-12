@@ -8,13 +8,14 @@ Pera permite registrar movimientos, consultar un resumen de tus finanzas y mante
 
 ## Funcionalidades
 
-- **Panel financiero** para consultar información y movimientos.
-- **Registro de movimientos** de ingresos, gastos, ahorros, inversiones y transferencias.
-- **Cuentas y datos organizados** con categorías, contactos y tipos de relación.
+- **Panel financiero** para consultar información y movimientos, con el resumen de ingresos, gastos, ahorros y el balance.
+- **Registro de movimientos** de ingresos, gastos y ahorros.
+- **Cuentas y datos organizados** con categorías, contactos (personas, empresas y mascotas) y tipos de relación.
+- **Alta rápida** de categorías, tipos de relación y contactos desde los selectores, sin salir de la pantalla.
 - **Movimientos programados** para gestionar recurrencias.
 - **Notas y archivos adjuntos** asociados a la información de la aplicación.
 - **Copias de seguridad** locales, exportación e importación de datos.
-- **Preferencias de idioma y tema**: español o inglés; claro, oscuro o según el sistema.
+- **Preferencias de idioma y tema**: español o inglés, con detección del idioma del navegador en el primer uso; claro, oscuro o según el sistema.
 - **Almacenamiento local** en el navegador mediante IndexedDB y Dexie.
 - **Configuración PWA** para ofrecer una experiencia instalable en navegadores compatibles.
 
@@ -73,6 +74,15 @@ bun run build
 ```
 
 Los archivos generados se guardan en `dist/`. La configuración PWA y el service worker se incluyen en la compilación de producción.
+
+## Despliegue
+
+El despliegue se realiza en [Cloudflare Workers](https://workers.cloudflare.com/) con assets estáticos. El archivo `wrangler.toml` publica el contenido de `dist/Pera/browser` y resuelve las rutas con un fallback de aplicación de una sola página (SPA):
+
+```bash
+bun run build
+bunx wrangler deploy
+```
 
 ## Estructura general
 
