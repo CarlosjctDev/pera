@@ -19,6 +19,7 @@ import { AttachmentPicker } from '@app/features/attachments/components/attachmen
 import { AttachmentService } from '@app/features/attachments/services/attachment.service';
 
 import type { TranslationKey } from '@app/core/i18n/i18n.keys';
+import { canIncludeSelfContact } from '@app/features/master-data/models/contact-kind.model';
 import type { ContactKind } from '@app/features/master-data/models/contact-kind.model';
 
 @Component({
@@ -60,7 +61,7 @@ export class ExpenseForm {
             .filter((contact) => contact.kind === kind && contact.isSelf !== true)
             .map((contact) => ({ value: contact.id ?? null, label: contact.name }));
 
-    return self?.id !== undefined
+    return canIncludeSelfContact(kind) && self?.id !== undefined
       ? [{ value: self.id, label: self.name }, ...options]
       : options;
   });

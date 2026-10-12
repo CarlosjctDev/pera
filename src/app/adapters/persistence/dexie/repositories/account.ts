@@ -17,6 +17,14 @@ function queryTerm(value: string | undefined): string {
   return normalizeText(value ?? '').toLowerCase();
 }
 
+export function compareAccountStatus(a: Account, b: Account): number {
+  if (a.status === b.status) {
+    return 0;
+  }
+
+  return a.status === 'pending' ? -1 : 1;
+}
+
 function compareDueDate(a: Account, b: Account): number {
   const left = a.dueDate;
   const right = b.dueDate;
@@ -124,13 +132,20 @@ export class DexieAccountRepository implements AccountRepository {
     let rows = await collection.toArray();
 
     if (sort === null || sort === undefined) {
-      rows.sort((a, b) => compareDueDate(a, b) || compareId(a, b));
+      rows.sort(
+        (a, b) => compareAccountStatus(a, b) || compareDueDate(a, b) || compareId(a, b),
+      );
     } else if (sort.key === 'dueDate') {
       const factor = sort.dir === 'desc' ? -1 : 1;
-      rows.sort((a, b) => (compareDueDate(a, b) || compareId(a, b)) * factor);
+      rows.sort(
+        (a, b) =>
+          compareAccountStatus(a, b) || (compareDueDate(a, b) || compareId(a, b)) * factor,
+      );
     } else {
       const factor = sort.dir === 'desc' ? -1 : 1;
-      rows.sort((a, b) => (a.amount - b.amount) * factor || compareId(a, b));
+      rows.sort(
+        (a, b) => compareAccountStatus(a, b) || (a.amount - b.amount) * factor || compareId(a, b),
+      );
     }
 
     if (limit !== -1) {

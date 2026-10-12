@@ -44,6 +44,7 @@ import { AttachmentService } from '@app/features/attachments/services/attachment
 
 import type { Account, AccountType } from '@app/features/transactions/models/account.model';
 import type { Contact } from '@app/features/master-data/models/contact.model';
+import { canIncludeSelfContact } from '@app/features/master-data/models/contact-kind.model';
 import type { ContactKind } from '@app/features/master-data/models/contact-kind.model';
 
 const DEFAULT_QUERY: DataTableQuery = {
@@ -102,7 +103,7 @@ export class Accounts {
             .filter((contact) => contact.kind === kind && contact.isSelf !== true)
             .map((contact) => ({ value: contact.id ?? null, label: contact.name }));
 
-    return self?.id !== undefined
+    return canIncludeSelfContact(kind) && self?.id !== undefined
       ? [{ value: self.id, label: self.name }, ...options]
       : options;
   });
