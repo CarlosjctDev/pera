@@ -10,12 +10,10 @@ import { T } from '@app/core/i18n/pipes/t.pipe';
 import { ContactService } from '@app/features/master-data/services/contact.service';
 import { ExpenseForm } from '@app/features/transactions/components/expense-form/expense-form';
 import { IncomeForm } from '@app/features/transactions/components/income-form/income-form';
-import { InvestmentForm } from '@app/features/transactions/components/investment-form/investment-form';
 import { MovementList } from '@app/features/transactions/components/movement-list/movement-list';
 import { MovementTypes } from '@app/features/transactions/components/movement-types/movement-types';
 import { SavingForm } from '@app/features/transactions/components/saving-form/saving-form';
 import { ScheduledListDialogComponent } from '@app/features/transactions/components/scheduled-list-dialog/scheduled-list-dialog';
-import { TransferForm } from '@app/features/transactions/components/transfer-form/transfer-form';
 import { Accounts } from '@app/features/transactions/pages/accounts/accounts';
 import { CategoryService } from '@app/features/transactions/services/category.service';
 import { TransactionService } from '@app/features/transactions/services/transaction.service';
@@ -40,8 +38,6 @@ const SECTION_ICONS: Record<Section, IconName> = {
     IncomeForm,
     ExpenseForm,
     SavingForm,
-    InvestmentForm,
-    TransferForm,
     MovementList,
     Accounts,
   ],

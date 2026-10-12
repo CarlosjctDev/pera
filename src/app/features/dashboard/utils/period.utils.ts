@@ -81,8 +81,6 @@ export function summarize(
   let income = 0;
   let expense = 0;
   let saving = 0;
-  let investment = 0;
-  let transfer = 0;
   let count = 0;
 
   for (const transaction of transactions) {
@@ -102,11 +100,6 @@ export function summarize(
       case 'saving':
         saving += transaction.amount;
         break;
-      case 'investment':
-        investment += transaction.amount;
-        break;
-      default:
-        transfer += transaction.amount;
     }
   }
 
@@ -144,8 +137,6 @@ export function summarize(
     expense,
     balance: income - expense,
     saving,
-    investment,
-    transfer,
     receivable,
     payable,
     count,

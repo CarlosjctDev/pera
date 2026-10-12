@@ -23,8 +23,6 @@ export interface PeriodTotals {
   readonly expense: number;
   readonly balance: number;
   readonly saving: number;
-  readonly investment: number;
-  readonly transfer: number;
   readonly receivable: number;
   readonly payable: number;
   readonly count: number;

@@ -49,8 +49,6 @@ const MOVEMENT_MARKERS: Record<TransactionType, string> = {
   income: 'bg-emerald-500',
   expense: 'bg-red-500',
   saving: 'bg-amber-500',
-  investment: 'bg-sky-500',
-  transfer: 'bg-violet-500',
 };
 
 @Component({
@@ -74,13 +72,7 @@ export class FinancialCalendar implements OnInit {
   private readonly toastr = inject(ToastrService);
 
   protected readonly weekdays: readonly number[] = [0, 1, 2, 3, 4, 5, 6];
-  protected readonly movementTypes: readonly TransactionType[] = [
-    'income',
-    'expense',
-    'saving',
-    'investment',
-    'transfer',
-  ];
+  protected readonly movementTypes: readonly TransactionType[] = ['income', 'expense', 'saving'];
   protected readonly selectedDay = signal<string | null>(null);
 
   private readonly categoryNames = computed(() => {
@@ -401,7 +393,7 @@ export class FinancialCalendar implements OnInit {
       case 'payable':
         return 'bg-rose-500';
       default:
-        return MOVEMENT_MARKERS[event.transactionType ?? 'transfer'];
+        return MOVEMENT_MARKERS[event.transactionType ?? 'income'];
     }
   }
 
@@ -429,12 +421,12 @@ export class FinancialCalendar implements OnInit {
       return 'expense';
     }
 
-    return event.transactionType ?? 'transfer';
+    return event.transactionType ?? 'income';
   }
 
   protected eventBadge(event: CalendarEvent): TranslationKey {
     if (event.kind === 'movement') {
-      return `movements.type.${event.transactionType ?? 'transfer'}` as TranslationKey;
+      return `movements.type.${event.transactionType ?? 'income'}` as TranslationKey;
     }
 
     return event.kind === 'receivable'
@@ -451,7 +443,7 @@ export class FinancialCalendar implements OnInit {
       return 'text-rose-600 dark:text-rose-400';
     }
 
-    return TRANSACTION_TYPE_COLORS[event.transactionType ?? 'transfer'];
+    return TRANSACTION_TYPE_COLORS[event.transactionType ?? 'income'];
   }
 
   protected weekdayLabel(index: number): TranslationKey {

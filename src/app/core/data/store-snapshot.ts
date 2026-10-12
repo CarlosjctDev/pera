@@ -4,7 +4,7 @@ import type { CurrencyCode } from '@app/features/profile/models/currency.model';
 import { environment } from '@env/environment';
 
 export const STORE_SNAPSHOT_APP = environment.appName;
-export const STORE_SCHEMA_VERSION = 7;
+export const STORE_SCHEMA_VERSION = 8;
 
 const BASE_SNAPSHOT_TABLES = [
   'profiles',
@@ -31,14 +31,16 @@ const SNAPSHOT_TABLES_BY_VERSION: Readonly<Record<number, readonly string[]>> = 
   5: V5_SNAPSHOT_TABLES as readonly string[],
   6: V5_SNAPSHOT_TABLES as readonly string[],
   7: ALL_SNAPSHOT_TABLES as readonly string[],
+  8: ALL_SNAPSHOT_TABLES as readonly string[],
 };
 
-const TRANSACTION_TYPES = ['income', 'expense', 'saving', 'investment', 'transfer'] as const;
+const TRANSACTION_TYPES = ['income', 'expense', 'saving'] as const;
 const ACCOUNT_TYPES = ['receivable', 'payable'] as const;
 const ACCOUNT_STATUSES = ['pending', 'paid'] as const;
 const ATTACHMENT_OWNER_TYPES = ['transaction', 'account'] as const;
 const RECURRENCE_KINDS = ['none', 'days', 'weeks', 'months', 'years'] as const;
 const GENDERS = ['male', 'female', 'non_binary', 'prefer_not_to_say', 'other'] as const;
+const CONTACT_KINDS = ['person', 'company', 'pet'] as const;
 
 export interface ProfileSnapshot {
   readonly id: number;
@@ -73,7 +75,7 @@ export interface RelationshipTypeSnapshot {
 export interface ContactSnapshot {
   readonly id: number;
   readonly name: string;
-  readonly isCompany: boolean;
+  readonly kind: (typeof CONTACT_KINDS)[number];
   readonly gender: (typeof GENDERS)[number] | null;
   readonly relationshipTypeId?: number;
 }
@@ -170,7 +172,7 @@ export type SnapshotProblemCode =
   | 'invalidStartDate'
   | 'invalidNextDate'
   | 'invalidActive'
-  | 'invalidIsCompany'
+  | 'invalidKind'
   | 'invalidGender'
   | 'invalidRelationshipType'
   | 'invalidCurrency'
@@ -335,6 +337,20 @@ function normalizeConcepts(rows: readonly Row[]): void {
   }
 }
 
+function normalizeContacts(section: unknown): void {
+  if (!Array.isArray(section)) {
+    return;
+  }
+
+  for (const row of section) {
+    if (row['kind'] === undefined && typeof row['isCompany'] === 'boolean') {
+      row['kind'] = row['isCompany'] ? 'company' : 'person';
+    }
+
+    delete row['isCompany'];
+  }
+}
+
 function positiveIds(rows: readonly Row[]): Set<number> {
   const ids = new Set<number>();
 
@@ -416,10 +432,12 @@ export function parseStoreSnapshot(raw: unknown): StoreSnapshot {
   );
   pushDuplicateIds(problems, 'relationshipTypes', relationshipTypes);
 
+  normalizeContacts(tables['contacts']);
+
   const contacts = validateTable(problems, 'contacts', tables['contacts'], [
     { check: (row) => (isPosInteger(row['id']) ? null : 'invalidId') },
     { check: (row) => (isNonEmptyString(row['name']) ? null : 'invalidName') },
-    { check: (row) => (typeof row['isCompany'] === 'boolean' ? null : 'invalidIsCompany') },
+    { check: (row) => (oneOf(CONTACT_KINDS)(row['kind']) ? null : 'invalidKind') },
     {
       check: (row) =>
         row['gender'] === null || oneOf(GENDERS)(row['gender']) ? null : 'invalidGender',

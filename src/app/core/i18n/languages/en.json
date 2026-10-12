@@ -46,9 +46,9 @@
     "categoriesTitle": "Categories",
     "categoriesDescription": "Organize your movements.",
     "relationshipsTitle": "Relationship types",
-    "relationshipsDescription": "Define how you relate to your people or companies.",
+    "relationshipsDescription": "Define how you relate to your contacts.",
     "contactsTitle": "Contacts",
-    "contactsDescription": "Keep your trusted people and companies.",
+    "contactsDescription": "Keep your trusted contacts.",
     "itemCount": "{{ count }} registered",
     "itemSize": "Takes: {{ size }}"
   },
@@ -60,6 +60,7 @@
       "pendingTitle": "Pending accounts",
       "income": "Income",
       "expense": "Expenses",
+      "saving": "Savings",
       "balance": "Balance",
       "pendingReceivable": "Receivable",
       "pendingPayable": "Payable",
@@ -143,14 +144,14 @@
         "avgPerMovement": "Average amount"
       },
       "topCategories": "Top categories",
-      "topContacts": "Top people/companies",
+      "topContacts": "Top contacts",
       "empty": "No data in this period"
     }
   },
   "accounts": {
     "receivableTitle": "Accounts receivable",
     "payableTitle": "Accounts payable",
-    "contact": "Person or company",
+    "contact": "Contact",
     "contactPlaceholder": "Select who it belongs to",
     "amount": "Amount",
     "concept": "Concept",
@@ -161,7 +162,10 @@
     "dueDatePlaceholder": "When it's due (optional)",
     "startDate": "Start date",
     "statusLabel": "Status",
-    "submit": "Add account",
+    "submit": {
+      "receivable": "Add receivable account",
+      "payable": "Add payable account"
+    },
     "empty": "No accounts yet",
     "totalPending": "Total pending",
     "status": {
@@ -219,35 +223,35 @@
     "description": {
       "income": "Money you receive for any reason.",
       "expense": "Money you pay or spend.",
-      "saving": "Money you set aside for the future.",
-      "investment": "Money you put to work.",
-      "transfer": "Money you move between accounts or people."
+      "saving": "Money you set aside for the future."
     },
     "type": {
       "income": "Income",
       "expense": "Expense",
-      "saving": "Saving",
-      "investment": "Investment",
-      "transfer": "Transfer"
+      "saving": "Saving"
     },
     "amount": "Amount",
     "category": "Category",
     "categoryPlaceholder": "Select a category",
     "needCategories": "Create a category first",
-    "contact": "Person or company",
-    "contactPlaceholder": "Select a person or company",
-    "needContacts": "Create a person or company first",
+    "contact": "Contact",
+    "contactPlaceholder": "Select who it corresponds to",
+    "needContacts": "Create a contact first",
     "concept": "Concept",
     "conceptPlaceholder": "Describe the movement (optional)",
     "detail": "Detail",
     "date": "Date",
-    "submit": "Add movement",
+    "submit": {
+      "income": "Add income",
+      "expense": "Add expense",
+      "saving": "Add saving"
+    },
     "list": "Movements",
     "empty": "No movements yet",
     "errors": {
       "amount": "Enter a valid amount",
       "category": "Select a category",
-      "contact": "Select a person or company"
+      "contact": "Select who it corresponds to"
     },
     "deleteConfirmTitle": "Delete movement",
     "deleteConfirmMessage": "Are you sure you want to delete this movement?"
@@ -292,7 +296,7 @@
     "submit": "Add type",
     "empty": "No relationship types yet",
     "deleteConfirmTitle": "Delete relationship type",
-    "deleteConfirmMessage": "The type will be deleted and people using it will have no type.",
+    "deleteConfirmMessage": "The type will be deleted and the contacts using it will have no type.",
     "inUse": "Used by contacts",
     "errors": {
       "name": "Enter a name",
@@ -318,13 +322,19 @@
     },
     "kind": {
       "person": "Person",
-      "company": "Company"
+      "company": "Company",
+      "pet": "Pet"
     },
     "kindDescription": {
       "person": "A natural person you have a relationship with.",
-      "company": "A company or business you deal with."
+      "company": "A company or business you deal with.",
+      "pet": "A pet you have a relationship with."
     },
-    "submit": "Add",
+    "submit": {
+      "person": "Add person",
+      "company": "Add company",
+      "pet": "Add pet"
+    },
     "empty": "No contacts yet",
     "deleteConfirmTitle": "Delete contact",
     "deleteConfirmMessage": "The contact will be removed from the transactions and accounts that use it.",
@@ -452,7 +462,7 @@
         "invalidStartDate": "{{ table }}[{{ index }}]: invalid start date",
         "invalidNextDate": "{{ table }}[{{ index }}]: invalid next date",
         "invalidActive": "{{ table }}[{{ index }}]: invalid active flag",
-        "invalidIsCompany": "{{ table }}[{{ index }}]: invalid company flag",
+        "invalidKind": "{{ table }}[{{ index }}]: invalid contact kind",
         "invalidGender": "{{ table }}[{{ index }}]: invalid gender",
         "invalidRelationshipType": "{{ table }}[{{ index }}]: invalid relationship type",
         "invalidCurrency": "{{ table }}[{{ index }}]: invalid currency",
@@ -475,7 +485,7 @@
       "button": "View information",
       "version": "Version",      
       "purposeTitle": "Personal finance",
-      "purposeDescription": "Track your income, expenses, savings, investments, and debts in one place.",
+      "purposeDescription": "Track your income, expenses, savings, and debts in one place.",
       "privacyTitle": "Your data, under your control",
       "privacyDescription": "Your financial information is stored locally on your device.",
       "developerTitle": "Developer",

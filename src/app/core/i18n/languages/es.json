@@ -46,9 +46,9 @@
     "categoriesTitle": "Categorías",
     "categoriesDescription": "Organiza tus movimientos.",
     "relationshipsTitle": "Tipos de relación",
-    "relationshipsDescription": "Define cómo te relacionas con tus personas o empresas.",
+    "relationshipsDescription": "Define cómo te relacionas con tus contactos.",
     "contactsTitle": "Contactos",
-    "contactsDescription": "Guarda tus personas y empresas de confianza.",
+    "contactsDescription": "Guarda tus contactos de confianza.",
     "itemCount": "{{ count }} registrados",
     "itemSize": "Ocupa: {{ size }}"
   },
@@ -60,6 +60,7 @@
       "pendingTitle": "Cuentas pendientes",
       "income": "Ingresos",
       "expense": "Gastos",
+      "saving": "Ahorros",
       "balance": "Balance",
       "pendingReceivable": "Por cobrar",
       "pendingPayable": "Por pagar",
@@ -143,14 +144,14 @@
         "avgPerMovement": "Importe medio"
       },
       "topCategories": "Top categorías",
-      "topContacts": "Top personas/empresas",
+      "topContacts": "Top contactos",
       "empty": "Sin datos en este periodo"
     }
   },
   "accounts": {
     "receivableTitle": "Cuentas por cobrar",
     "payableTitle": "Cuentas por pagar",
-    "contact": "Persona o empresa",
+    "contact": "Contacto",
     "contactPlaceholder": "Selecciona a quién corresponde",
     "amount": "Monto",
     "concept": "Concepto",
@@ -161,7 +162,10 @@
     "dueDatePlaceholder": "Cuándo vence (opcional)",
     "startDate": "Fecha de inicio",
     "statusLabel": "Estado",
-    "submit": "Añadir cuenta",
+    "submit": {
+      "receivable": "Añadir cuenta por cobrar",
+      "payable": "Añadir cuenta por pagar"
+    },
     "empty": "Aún no hay cuentas",
     "totalPending": "Total pendiente",
     "status": {
@@ -219,35 +223,35 @@
     "description": {
       "income": "El dinero que recibes por cualquier motivo.",
       "expense": "El dinero que pagas o gastas.",
-      "saving": "El dinero que apartas para el futuro.",
-      "investment": "El dinero que pones a trabajar.",
-      "transfer": "El dinero que mueves entre cuentas o personas."
+      "saving": "El dinero que apartas para el futuro."
     },
     "type": {
       "income": "Ingreso",
       "expense": "Gasto",
-      "saving": "Ahorro",
-      "investment": "Inversión",
-      "transfer": "Transferencia"
+      "saving": "Ahorro"
     },
     "amount": "Importe",
     "category": "Categoría",
     "categoryPlaceholder": "Selecciona una categoría",
     "needCategories": "Crea primero una categoría",
-    "contact": "Persona o empresa",
-    "contactPlaceholder": "Selecciona una persona o empresa",
-    "needContacts": "Crea primero una persona o empresa",
+    "contact": "Contacto",
+    "contactPlaceholder": "Selecciona a quién corresponde",
+    "needContacts": "Crea primero un contacto",
     "concept": "Concepto",
     "conceptPlaceholder": "Describe el movimiento (opcional)",
     "detail": "Detalle",
     "date": "Fecha",
-    "submit": "Añadir movimiento",
+    "submit": {
+      "income": "Añadir ingreso",
+      "expense": "Añadir gasto",
+      "saving": "Añadir ahorro"
+    },
     "list": "Movimientos",
     "empty": "Aún no hay movimientos",
     "errors": {
       "amount": "Introduce un importe válido",
       "category": "Selecciona una categoría",
-      "contact": "Selecciona una persona o empresa"
+      "contact": "Selecciona a quién corresponde"
     },
     "deleteConfirmTitle": "Eliminar movimiento",
     "deleteConfirmMessage": "¿Seguro que quieres eliminar este movimiento?"
@@ -292,7 +296,7 @@
     "submit": "Añadir tipo",
     "empty": "Aún no hay tipos de relación",
     "deleteConfirmTitle": "Eliminar tipo de relación",
-    "deleteConfirmMessage": "Se eliminará el tipo y las personas que lo usan quedarán sin tipo.",
+    "deleteConfirmMessage": "Se eliminará el tipo y los contactos que lo usan quedarán sin tipo.",
     "inUse": "Hay contactos que la usan",
     "errors": {
       "name": "Escribe un nombre",
@@ -318,13 +322,19 @@
     },
     "kind": {
       "person": "Persona",
-      "company": "Empresa"
+      "company": "Empresa",
+      "pet": "Mascota"
     },
     "kindDescription": {
       "person": "Una persona natural con la que tienes relación.",
-      "company": "Una empresa o negocio con el que te relacionas."
+      "company": "Una empresa o negocio con el que te relacionas.",
+      "pet": "Una mascota con la que tienes relación."
     },
-    "submit": "Añadir",
+    "submit": {
+      "person": "Añadir persona",
+      "company": "Añadir empresa",
+      "pet": "Añadir mascota"
+    },
     "empty": "Aún no hay contactos",
     "deleteConfirmTitle": "Eliminar contacto",
     "deleteConfirmMessage": "Se eliminará el contacto de los movimientos y cuentas que lo usen.",
@@ -452,7 +462,7 @@
         "invalidStartDate": "{{ table }}[{{ index }}]: fecha de inicio inválida",
         "invalidNextDate": "{{ table }}[{{ index }}]: próxima fecha inválida",
         "invalidActive": "{{ table }}[{{ index }}]: estado de actividad inválido",
-        "invalidIsCompany": "{{ table }}[{{ index }}]: indicador de empresa inválido",
+        "invalidKind": "{{ table }}[{{ index }}]: tipo de contacto inválido",
         "invalidGender": "{{ table }}[{{ index }}]: género inválido",
         "invalidRelationshipType": "{{ table }}[{{ index }}]: tipo de relación inválido",
         "invalidCurrency": "{{ table }}[{{ index }}]: moneda inválida",
@@ -475,7 +485,7 @@
       "version": "Versión",
       "description": "Una aplicación sencilla para organizar tus finanzas personales y tener una visión más clara de tu dinero.",
       "purposeTitle": "Finanzas personales",
-      "purposeDescription": "Registra tus ingresos, gastos, ahorros, inversiones y deudas en un solo lugar.",
+      "purposeDescription": "Registra tus ingresos, gastos, ahorros y deudas en un solo lugar.",
       "privacyTitle": "Tus datos, bajo tu control",
       "privacyDescription": "Tu información financiera se almacena localmente en tu dispositivo.",
       "developerTitle": "Desarrollador",

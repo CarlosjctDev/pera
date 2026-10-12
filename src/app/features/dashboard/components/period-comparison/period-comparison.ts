@@ -47,8 +47,6 @@ type MetricKey =
   | 'expense'
   | 'balance'
   | 'saving'
-  | 'investment'
-  | 'transfer'
   | 'receivable'
   | 'payable';
 
@@ -133,18 +131,6 @@ const METRIC_DEFS: readonly MetricDef[] = [
     bar: 'bg-amber-500',
   },
   {
-    key: 'investment',
-    labelKey: 'movements.type.investment',
-    color: TRANSACTION_TYPE_COLORS.investment,
-    bar: 'bg-sky-500',
-  },
-  {
-    key: 'transfer',
-    labelKey: 'movements.type.transfer',
-    color: TRANSACTION_TYPE_COLORS.transfer,
-    bar: 'bg-violet-500',
-  },
-  {
     key: 'receivable',
     labelKey: 'accounts.receivableTitle',
     color: 'text-teal-600 dark:text-teal-400',
@@ -195,8 +181,6 @@ export class PeriodComparison implements OnInit, OnDestroy {
     'income',
     'expense',
     'saving',
-    'investment',
-    'transfer',
     'receivable',
     'payable',
   ];
@@ -514,7 +498,7 @@ export class PeriodComparison implements OnInit, OnDestroy {
     key: string,
     cells: readonly CellRef[],
   ): void {
-    if (event.pointerType === 'mouse' && event.button !== 0) {
+    if (event.pointerType !== 'mouse' || event.button !== 0) {
       return;
     }
 

@@ -40,12 +40,8 @@
       <app-income-form />
     } @else if (type() === 'expense') {
       <app-expense-form />
-    } @else if (type() === 'saving') {
-      <app-saving-form />
-    } @else if (type() === 'investment') {
-      <app-investment-form />
     } @else {
-      <app-transfer-form />
+      <app-saving-form />
     }
 
     <app-movement-list />
