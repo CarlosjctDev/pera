@@ -246,6 +246,18 @@
       "expense": "Add expense",
       "saving": "Add saving"
     },
+    "savings": {
+      "title": "Savings",
+      "hint": "Set aside part of this income as savings. The total cannot exceed the income amount.",
+      "add": "Add saving",
+      "addTitle": "Add savings to income",
+      "item": "Saving",
+      "remove": "Remove saving",
+      "empty": "No savings yet",
+      "total": "Total saved",
+      "remaining": "Available",
+      "exceeds": "Savings cannot exceed the income amount."
+    },
     "list": "Movements",
     "empty": "No movements yet",
     "errors": {
@@ -469,6 +481,7 @@
         "invalidCreatedAt": "{{ table }}[{{ index }}]: invalid creation date",
         "missingCategoryReference": "{{ table }}[{{ index }}]: the referenced category ({{ id }}) does not exist",
         "missingContactReference": "{{ table }}[{{ index }}]: the referenced contact ({{ id }}) does not exist",
+        "missingIncomeReference": "{{ table }}[{{ index }}]: the referenced income ({{ id }}) does not exist",
         "missingRelationshipReference": "{{ table }}[{{ index }}]: the referenced relationship type ({{ id }}) does not exist",
         "invalidOwnerType": "{{ table }}[{{ index }}]: invalid owner type",
         "invalidOwnerId": "{{ table }}[{{ index }}]: invalid owner",

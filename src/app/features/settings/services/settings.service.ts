@@ -67,6 +67,7 @@ const SNAPSHOT_PROBLEM_KEYS: Record<SnapshotProblemCode, TranslationKey> = {
   invalidCreatedAt: 'settings.data.importProblems.invalidCreatedAt',
   missingCategoryReference: 'settings.data.importProblems.missingCategoryReference',
   missingContactReference: 'settings.data.importProblems.missingContactReference',
+  missingIncomeReference: 'settings.data.importProblems.missingIncomeReference',
   missingRelationshipReference: 'settings.data.importProblems.missingRelationshipReference',
   invalidOwnerType: 'settings.data.importProblems.invalidOwnerType',
   invalidOwnerId: 'settings.data.importProblems.invalidOwnerId',

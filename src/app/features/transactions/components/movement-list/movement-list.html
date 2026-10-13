@@ -42,6 +42,16 @@
 
 <ng-template #actionsCell let-transaction>
   <div class="flex items-center justify-end gap-1">
+    @if (canAddSaving(transaction)) {
+      <button
+        type="button"
+        (click)="addSavings(transaction)"
+        [tippy]="'movements.savings.add' | t"
+        class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg text-app-muted transition hover:bg-app-primary/10 hover:text-app-primary"
+      >
+        <app-icon name="saving" class="h-4 w-4" />
+      </button>
+    }
     <button
       type="button"
       (click)="openNotes(transaction)"

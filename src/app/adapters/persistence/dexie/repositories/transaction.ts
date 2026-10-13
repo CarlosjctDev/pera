@@ -61,16 +61,21 @@ export class DexieTransactionRepository implements TransactionRepository {
       this.db.attachments,
       this.db.notes,
       async () => {
+        const linkedIds = (await this.db.transactions
+          .filter((transaction) => transaction.incomeId === id)
+          .keys()) as readonly number[];
+        const ids = new Set<number>([id, ...linkedIds]);
+
         await this.db.attachments
           .filter(
             (attachment) =>
-              attachment.ownerType === 'transaction' && attachment.ownerId === id,
+              attachment.ownerType === 'transaction' && ids.has(attachment.ownerId),
           )
           .delete();
         await this.db.notes
-          .filter((note) => note.ownerType === 'transaction' && note.ownerId === id)
+          .filter((note) => note.ownerType === 'transaction' && ids.has(note.ownerId))
           .delete();
-        await this.db.transactions.delete(id);
+        await this.db.transactions.bulkDelete([...ids]);
       },
     );
   }

@@ -23,6 +23,8 @@ import { I18nCurrency } from '@app/core/i18n/pipes/currency.pipe';
 import { I18nDate } from '@app/core/i18n/pipes/date.pipe';
 import { T } from '@app/core/i18n/pipes/t.pipe';
 import { DataChangesService } from '@app/core/realtime/data-changes.service';
+import { normalizeText } from '@app/core/utils/text.utils';
+import { SELF_CONTACT_ID } from '@app/features/master-data/models/contact.model';
 import { ContactService } from '@app/features/master-data/services/contact.service';
 import { ProfileService } from '@app/features/profile/services/profile.service';
 import { CategoryService } from '@app/features/transactions/services/category.service';
@@ -31,7 +33,10 @@ import { AttachmentListDialogComponent } from '@app/features/attachments/compone
 import { AttachmentService } from '@app/features/attachments/services/attachment.service';
 import { NoteDialogComponent } from '@app/features/notes/components/note-dialog/note-dialog';
 import { NoteService } from '@app/features/notes/services/note.service';
+import { SavingsDialogComponent } from '@app/features/transactions/components/savings-dialog/savings-dialog';
 
+import type { SavingsDialogData } from '@app/features/transactions/components/savings-dialog/savings-dialog';
+import type { SavingDraft } from '@app/features/transactions/models/saving-draft.model';
 import type { Contact } from '@app/features/master-data/models/contact.model';
 import type { Category } from '@app/features/transactions/models/category.model';
 import type { Transaction } from '@app/features/transactions/models/transaction.model';
@@ -156,7 +161,7 @@ export class MovementList {
         key: 'actions',
         labelKey: 'common.actions',
         align: 'right',
-        widthClass: 'w-24',
+        widthClass: 'w-28',
         cellTemplate: actionsCell,
       },
     ];
@@ -292,6 +297,58 @@ export class MovementList {
       transaction.id !== undefined &&
       this.ownersWithAttachments().has(`transaction:${transaction.id}`)
     );
+  }
+
+  protected canAddSaving(transaction: Transaction): boolean {
+    return transaction.type === 'income' && transaction.id !== undefined;
+  }
+
+  protected addSavings(transaction: Transaction): void {
+    if (transaction.id === undefined) {
+      return;
+    }
+
+    const dialogRef = this.dialog.open<readonly SavingDraft[] | undefined>(
+      SavingsDialogComponent,
+      {
+        data: { max: this.remainingToSave(transaction) } satisfies SavingsDialogData,
+      },
+    );
+
+    dialogRef.closed.subscribe(async (drafts) => {
+      if (drafts === undefined || drafts.length === 0 || transaction.id === undefined) {
+        return;
+      }
+
+      try {
+        for (const draft of drafts) {
+          await this.transactionService.add({
+            type: 'saving',
+            categoryId: draft.categoryId as number,
+            contactId: SELF_CONTACT_ID,
+            date: transaction.date,
+            concept: normalizeText(draft.concept),
+            amount: Math.round((draft.amount as number) * 100) / 100,
+            incomeId: transaction.id,
+          });
+        }
+
+        await this.fetch();
+        this.toastr.success('toasts.saved');
+      } catch {
+        this.toastr.error('toasts.saveError');
+      }
+    });
+  }
+
+  private remainingToSave(transaction: Transaction): number {
+    if (transaction.id === undefined) {
+      return 0;
+    }
+
+    const saved = this.transactionService.savedAmountForIncome(transaction.id);
+
+    return Math.max(0, Math.round((transaction.amount - saved) * 100) / 100);
   }
 
   private isAllowedSort(

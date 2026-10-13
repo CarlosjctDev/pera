@@ -12,7 +12,6 @@ import { ExpenseForm } from '@app/features/transactions/components/expense-form/
 import { IncomeForm } from '@app/features/transactions/components/income-form/income-form';
 import { MovementList } from '@app/features/transactions/components/movement-list/movement-list';
 import { MovementTypes } from '@app/features/transactions/components/movement-types/movement-types';
-import { SavingForm } from '@app/features/transactions/components/saving-form/saving-form';
 import { ScheduledListDialogComponent } from '@app/features/transactions/components/scheduled-list-dialog/scheduled-list-dialog';
 import { Accounts } from '@app/features/transactions/pages/accounts/accounts';
 import { CategoryService } from '@app/features/transactions/services/category.service';
@@ -37,7 +36,6 @@ const SECTION_ICONS: Record<Section, IconName> = {
     MovementTypes,
     IncomeForm,
     ExpenseForm,
-    SavingForm,
     MovementList,
     Accounts,
   ],

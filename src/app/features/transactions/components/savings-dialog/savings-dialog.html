@@ -1,0 +1,28 @@
+<app-dialog-shell [title]="'movements.savings.addTitle' | t" icon="wallet">
+  <div class="space-y-4">
+    <p class="text-xs text-app-muted">
+      {{ 'movements.savings.remaining' | t }}:
+      <strong class="text-app-fg">{{ data.max | i18nCurrency: currency() }}</strong>
+    </p>
+
+    <app-savings-editor [(value)]="drafts" [max]="data.max" />
+
+    <div class="flex justify-end gap-2 pt-1">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="cursor-pointer rounded-xl bg-app-secondary px-4 py-2 text-sm font-semibold text-app-secondary-fg transition hover:bg-app-secondary-hover"
+      >
+        {{ 'common.cancel' | t }}
+      </button>
+      <button
+        type="button"
+        (click)="save()"
+        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-app-primary px-4 py-2 text-sm font-semibold text-app-primary-fg transition hover:bg-app-primary-hover"
+      >
+        <app-icon name="save" class="h-4 w-4" />
+        {{ 'common.save' | t }}
+      </button>
+    </div>
+  </div>
+</app-dialog-shell>

@@ -21,7 +21,7 @@ export class MovementTypes {
 
   @Output() readonly select = new EventEmitter<TransactionType>();
 
-  protected readonly types: readonly TransactionType[] = ['income', 'expense', 'saving'];
+  protected readonly types: readonly TransactionType[] = ['income', 'expense'];
 
   protected typeLabel(type: TransactionType): TranslationKey {
     return `movements.type.${type}` as TranslationKey;

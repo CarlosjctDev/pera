@@ -127,6 +127,17 @@
     <app-schedule-fields #schedule />
   </div>
 
+  @if (!schedule.enabled()) {
+    <div class="space-y-3 rounded-2xl bg-app-secondary/20 p-3 ring-1 ring-inset ring-app-border">
+      <div class="flex items-center gap-2">
+        <app-icon name="saving" class="h-4 w-4 text-amber-600 dark:text-amber-400" />
+        <span class="text-sm font-semibold">{{ 'movements.savings.title' | t }}</span>
+      </div>
+      <p class="text-xs text-app-muted">{{ 'movements.savings.hint' | t }}</p>
+      <app-savings-editor [(value)]="savingDrafts" [max]="amount()" />
+    </div>
+  }
+
   <div class="pb-2">
     <app-attachment-picker [disabled]="schedule.enabled()" />
   </div>

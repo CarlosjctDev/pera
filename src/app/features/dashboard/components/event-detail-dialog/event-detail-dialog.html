@@ -64,6 +64,40 @@
       </div>
     </dl>
 
+    @if (data.incomeId !== undefined) {
+      <div class="space-y-2 border-t border-app-border pt-3">
+        <div class="flex items-center justify-between gap-2">
+          <h3 class="text-sm font-semibold text-app-fg">{{ 'movements.savings.title' | t }}</h3>
+          <button
+            type="button"
+            (click)="addSavings()"
+            class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-app-secondary px-2.5 py-1 text-xs font-semibold text-app-fg transition hover:bg-app-primary hover:text-app-primary-fg"
+          >
+            <app-icon name="saving" class="h-3.5 w-3.5" />
+            {{ 'movements.savings.add' | t }}
+          </button>
+        </div>
+        @if (savings().length === 0) {
+          <p class="text-sm text-app-muted">{{ 'movements.savings.empty' | t }}</p>
+        } @else {
+          <ul class="space-y-2">
+            @for (saving of savings(); track saving.id ?? $index) {
+              <li
+                class="flex items-center justify-between gap-3 rounded-xl bg-app-secondary px-3 py-2"
+              >
+                <span class="min-w-0 truncate text-sm text-app-fg">{{ saving.label }}</span>
+                <span
+                  class="shrink-0 text-sm font-semibold tabular-nums text-amber-600 dark:text-amber-400"
+                >
+                  {{ saving.amount | i18nCurrency: profile.currency() }}
+                </span>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
     @if (data.event.ownerId !== undefined) {
       <button
         type="button"

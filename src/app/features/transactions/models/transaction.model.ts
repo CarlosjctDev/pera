@@ -10,6 +10,7 @@ export interface Transaction {
   readonly amount: number;
   readonly scheduledId?: number;
   readonly accountId?: number;
+  readonly incomeId?: number;
 }
 
 export type NewTransaction = Omit<Transaction, 'id'>;

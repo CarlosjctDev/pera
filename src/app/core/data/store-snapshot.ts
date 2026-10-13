@@ -1,3 +1,4 @@
+import { SELF_CONTACT_ID } from '@app/features/master-data/models/contact.model';
 import { isCurrency } from '@app/features/profile/models/currency.model';
 
 import type { CurrencyCode } from '@app/features/profile/models/currency.model';
@@ -65,6 +66,7 @@ export interface TransactionSnapshot {
   readonly amount: number;
   readonly scheduledId?: number;
   readonly accountId?: number;
+  readonly incomeId?: number;
 }
 
 export interface RelationshipTypeSnapshot {
@@ -186,6 +188,7 @@ export type SnapshotProblemCode =
   | 'invalidText'
   | 'missingCategoryReference'
   | 'missingContactReference'
+  | 'missingIncomeReference'
   | 'missingRelationshipReference';
 
 export interface SnapshotProblem {
@@ -230,6 +233,12 @@ const isIsoDate = (value: unknown): value is string =>
 
 const isNullablePosInteger = (value: unknown): boolean =>
   value === undefined || value === null || isPosInteger(value);
+
+const isContactReference = (value: unknown): boolean =>
+  value === SELF_CONTACT_ID || isPosInteger(value);
+
+const isOptionalContactReference = (value: unknown): boolean =>
+  value === undefined || value === null || isContactReference(value);
 
 const oneOf =
   <T extends string>(values: readonly T[]) =>
@@ -457,8 +466,7 @@ export function parseStoreSnapshot(raw: unknown): StoreSnapshot {
     { check: (row) => (oneOf(TRANSACTION_TYPES)(row['type']) ? null : 'invalidType') },
     { check: (row) => (isPosInteger(row['categoryId']) ? null : 'invalidCategory') },
     {
-      check: (row) =>
-        row['contactId'] === undefined || isPosInteger(row['contactId']) ? null : 'invalidContact',
+      check: (row) => (isOptionalContactReference(row['contactId']) ? null : 'invalidContact'),
     },
     { check: (row) => (isIsoDate(row['date']) ? null : 'invalidDate') },
     { check: (row) => (isOptionalString(row['concept']) ? null : 'invalidConcept') },
@@ -472,6 +480,10 @@ export function parseStoreSnapshot(raw: unknown): StoreSnapshot {
     {
       check: (row) =>
         row['accountId'] === undefined || isPosInteger(row['accountId']) ? null : 'invalidId',
+    },
+    {
+      check: (row) =>
+        row['incomeId'] === undefined || isPosInteger(row['incomeId']) ? null : 'invalidId',
     },
   ]);
   normalizeConcepts(transactions);
@@ -497,7 +509,7 @@ export function parseStoreSnapshot(raw: unknown): StoreSnapshot {
           ? null
           : 'invalidCategory',
     },
-    { check: (row) => (isPosInteger(row['contactId']) ? null : 'invalidContact') },
+    { check: (row) => (isContactReference(row['contactId']) ? null : 'invalidContact') },
     { check: (row) => (isOptionalString(row['concept']) ? null : 'invalidConcept') },
     { check: (row) => (isFiniteNumber(row['amount']) ? null : 'invalidAmount') },
     {
@@ -525,9 +537,7 @@ export function parseStoreSnapshot(raw: unknown): StoreSnapshot {
       { check: (row) => (isPosInteger(row['categoryId']) ? null : 'invalidCategory') },
       {
         check: (row) =>
-          row['contactId'] === undefined || isPosInteger(row['contactId'])
-            ? null
-            : 'invalidContact',
+          isOptionalContactReference(row['contactId']) ? null : 'invalidContact',
       },
       { check: (row) => (isOptionalString(row['concept']) ? null : 'invalidConcept') },
       { check: (row) => (isFiniteNumber(row['amount']) ? null : 'invalidAmount') },
@@ -579,6 +589,11 @@ export function parseStoreSnapshot(raw: unknown): StoreSnapshot {
   const contactIds = positiveIds(contacts);
   const relationshipTypeIds = positiveIds(relationshipTypes);
   const transactionIds = positiveIds(transactions);
+  const incomeIds = new Set<number>(
+    transactions
+      .filter((row) => row['type'] === 'income' && isPosInteger(row['id']))
+      .map((row) => row['id'] as number),
+  );
   const accountIds = positiveIds(accounts);
 
   transactions.forEach((row, index) => {
@@ -595,6 +610,12 @@ export function parseStoreSnapshot(raw: unknown): StoreSnapshot {
     if (isPosInteger(row['contactId']) && !contactIds.has(row['contactId'])) {
       problems.push(
         problem('missingContactReference', { table: 'transactions', index, id: row['contactId'] }),
+      );
+    }
+
+    if (isPosInteger(row['incomeId']) && !incomeIds.has(row['incomeId'])) {
+      problems.push(
+        problem('missingIncomeReference', { table: 'transactions', index, id: row['incomeId'] }),
       );
     }
   });

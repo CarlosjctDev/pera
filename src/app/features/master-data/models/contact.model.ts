@@ -1,5 +1,7 @@
 import type { ContactKind } from './contact-kind.model';
 
+export const SELF_CONTACT_ID = 0;
+
 export type Gender = 'male' | 'female' | 'non_binary' | 'prefer_not_to_say' | 'other';
 
 export interface Contact {

@@ -39,9 +39,7 @@ export class FinancialSummary implements OnInit {
   protected readonly monthSaving = computed(() =>
     this.totalByType('saving', (date) => this.inSelectedMonth(date)),
   );
-  protected readonly monthBalance = computed(() =>
-    this.monthIncome() - this.monthExpense() + this.monthSaving(),
-  );
+  protected readonly monthBalance = computed(() => this.monthIncome() - this.monthExpense());
 
   protected readonly yearIncome = computed(() =>
     this.totalByType('income', (date) => this.inSelectedYear(date)),
@@ -52,9 +50,7 @@ export class FinancialSummary implements OnInit {
   protected readonly yearSaving = computed(() =>
     this.totalByType('saving', (date) => this.inSelectedYear(date)),
   );
-  protected readonly yearBalance = computed(() =>
-    this.yearIncome() - this.yearExpense() + this.yearSaving(),
-  );
+  protected readonly yearBalance = computed(() => this.yearIncome() - this.yearExpense());
 
   protected readonly pendingReceivable = computed(() => this.pendingTotal('receivable'));
   protected readonly pendingPayable = computed(() => this.pendingTotal('payable'));

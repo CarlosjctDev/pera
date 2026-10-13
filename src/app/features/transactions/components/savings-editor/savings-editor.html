@@ -1,0 +1,99 @@
+<div class="space-y-3">
+  @for (draft of value(); track $index) {
+    <div class="space-y-3 rounded-xl bg-app-secondary/40 p-3 ring-1 ring-inset ring-app-border">
+      <div class="flex items-center justify-between gap-2">
+        <span class="text-sm font-semibold">
+          {{ 'movements.savings.item' | t }} {{ $index + 1 }}
+        </span>
+        <button
+          type="button"
+          (click)="remove($index)"
+          [attr.aria-label]="'movements.savings.remove' | t"
+          class="cursor-pointer rounded-lg p-1.5 text-app-muted transition hover:bg-app-secondary hover:text-red-500"
+        >
+          <app-icon name="trash" class="h-4 w-4" />
+        </button>
+      </div>
+
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div class="space-y-1">
+          <label class="flex items-center justify-between text-sm font-medium">
+            <span>{{ 'movements.amount' | t }}</span>
+            <span class="text-xs font-normal text-app-muted">{{ symbol() }}</span>
+          </label>
+          <input
+            type="number"
+            inputmode="decimal"
+            min="0.01"
+            step="0.01"
+            class="w-full rounded-xl bg-app-secondary/50 px-3 py-2 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+            [attr.aria-invalid]="amountInvalid(draft)"
+            [ngModelOptions]="{ standalone: true }"
+            [ngModel]="draft.amount"
+            (ngModelChange)="onAmountChange($index, $event)"
+          />
+          @if (amountInvalid(draft)) {
+            <p class="text-xs text-red-500" role="alert">{{ 'movements.errors.amount' | t }}</p>
+          }
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-sm font-medium">{{ 'movements.concept' | t }}</label>
+          <input
+            type="text"
+            maxlength="120"
+            autocomplete="off"
+            class="w-full rounded-xl bg-app-secondary/50 px-3 py-2 text-sm text-app-fg ring-1 ring-inset ring-app-border transition focus:ring-2 focus:ring-app-primary focus:outline-none"
+            [placeholder]="'movements.conceptPlaceholder' | t"
+            [ngModelOptions]="{ standalone: true }"
+            [ngModel]="draft.concept"
+            (ngModelChange)="onConceptChange($index, $event)"
+          />
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-sm font-medium">{{ 'movements.category' | t }}</label>
+        <app-select
+          [options]="categoryOptions()"
+          [placeholder]="'movements.categoryPlaceholder' | t"
+          [invalid]="categoryInvalid(draft)"
+          [addTooltip]="'categories.submit' | t"
+          [ngModelOptions]="{ standalone: true }"
+          [ngModel]="draft.categoryId"
+          (ngModelChange)="onCategoryChange($index, $event)"
+          (add)="addCategory($index)"
+        />
+        @if (categoryInvalid(draft)) {
+          <p class="text-xs text-red-500" role="alert">{{ 'movements.errors.category' | t }}</p>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="flex flex-wrap items-center gap-2">
+    <button
+      type="button"
+      (click)="add()"
+      class="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-app-secondary px-3 py-2 text-sm font-semibold text-app-secondary-fg transition hover:bg-app-secondary-hover"
+    >
+      <app-icon name="plus" class="h-4 w-4" />
+      <span>{{ 'movements.savings.add' | t }}</span>
+    </button>
+
+    @if (value().length > 0) {
+      <span class="text-xs text-app-muted">
+        {{ 'movements.savings.total' | t }}:
+        <strong class="text-app-fg">{{ total() | i18nCurrency: currency() }}</strong>
+        · {{ 'movements.savings.remaining' | t }}:
+        <strong [class]="overLimit() ? 'text-red-500' : 'text-app-fg'">
+          {{ remaining() | i18nCurrency: currency() }}
+        </strong>
+      </span>
+    }
+  </div>
+
+  @if (overLimit()) {
+    <p class="text-xs text-red-500" role="alert">{{ 'movements.savings.exceeds' | t }}</p>
+  }
+</div>

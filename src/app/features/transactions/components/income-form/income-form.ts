@@ -13,6 +13,7 @@ import { ContactService } from '@app/features/master-data/services/contact.servi
 import { MasterDataDialogsService } from '@app/features/master-data/services/master-data-dialogs.service';
 import { CategoryService } from '@app/features/transactions/services/category.service';
 import { ScheduleFields } from '@app/features/transactions/components/schedule-fields/schedule-fields';
+import { SavingsEditor } from '@app/features/transactions/components/savings-editor/savings-editor';
 import { ScheduledMovementService } from '@app/features/transactions/services/scheduled-movement.service';
 import { TransactionService } from '@app/features/transactions/services/transaction.service';
 import { AttachmentPicker } from '@app/features/attachments/components/attachment-picker/attachment-picker';
@@ -21,10 +22,12 @@ import { AttachmentService } from '@app/features/attachments/services/attachment
 import type { TranslationKey } from '@app/core/i18n/i18n.keys';
 import { canIncludeSelfContact } from '@app/features/master-data/models/contact-kind.model';
 import type { ContactKind } from '@app/features/master-data/models/contact-kind.model';
+import { SELF_CONTACT_ID } from '@app/features/master-data/models/contact.model';
+import type { SavingDraft } from '@app/features/transactions/models/saving-draft.model';
 
 @Component({
   selector: 'app-income-form',
-  imports: [FormsModule, Icon, SelectComponent, T, ScheduleFields, AttachmentPicker],
+  imports: [FormsModule, Icon, SelectComponent, T, ScheduleFields, SavingsEditor, AttachmentPicker],
   templateUrl: './income-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -39,6 +42,7 @@ export class IncomeForm {
   private readonly toastr = inject(ToastrService);
 
   private readonly scheduleFields = viewChild.required(ScheduleFields);
+  private readonly savingsEditor = viewChild.required(SavingsEditor);
   private readonly attachments = viewChild.required(AttachmentPicker);
 
   protected readonly currency = this.profile.currency;
@@ -74,6 +78,7 @@ export class IncomeForm {
   protected readonly contactKind = signal<ContactKind | null>(null);
   protected readonly concept = signal('');
   protected readonly date = signal(this.todayString());
+  protected readonly savingDrafts = signal<readonly SavingDraft[]>([]);
   protected readonly amountError = signal(false);
   protected readonly categoryError = signal(false);
   protected readonly contactError = signal(false);
@@ -153,12 +158,19 @@ export class IncomeForm {
       return;
     }
 
-    this.saving.set(true);
-
     const schedule = this.scheduleFields();
     const scheduled = schedule.isEnabled();
+    const drafts = this.savingDrafts();
+
+    if (!scheduled && drafts.length > 0 && !this.savingsEditor().validate()) {
+      return;
+    }
+
+    this.saving.set(true);
+
     const concept = normalizeText(this.concept());
     const rounded = Math.round((amount as number) * 100) / 100;
+    const date = new Date(`${this.date()}T00:00:00`);
 
     try {
       if (scheduled) {
@@ -178,15 +190,35 @@ export class IncomeForm {
           type: 'income',
           categoryId: categoryId as number,
           contactId: this.contactId() ?? undefined,
-          date: new Date(`${this.date()}T00:00:00`),
+          date,
           concept,
           amount: rounded,
         });
 
         await this.saveAttachments(transaction.id as number);
+
+        if (transaction.id !== undefined) {
+          for (const draft of drafts) {
+            await this.transactionService.add({
+              type: 'saving',
+              categoryId: draft.categoryId as number,
+              contactId: SELF_CONTACT_ID,
+              date,
+              concept: normalizeText(draft.concept),
+              amount: Math.round((draft.amount as number) * 100) / 100,
+              incomeId: transaction.id,
+            });
+          }
+        }
       }
 
       this.attachments().clear();
+      this.savingDrafts.set([]);
+
+      if (!scheduled) {
+        this.savingsEditor().reset();
+      }
+
       this.amount.set(null);
       this.categoryId.set(null);
       this.contactId.set(null);

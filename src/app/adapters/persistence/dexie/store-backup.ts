@@ -113,6 +113,7 @@ export class DexieStoreBackup implements DataStoreBackup {
             amount,
             scheduledId,
             accountId,
+            incomeId,
           }): TransactionSnapshot => ({
             id: id as number,
             type,
@@ -123,6 +124,7 @@ export class DexieStoreBackup implements DataStoreBackup {
             amount,
             scheduledId,
             accountId,
+            incomeId,
           }),
         ),
         relationshipTypes: relationshipTypes.map(({ id, name }): RelationshipTypeSnapshot => ({
@@ -269,6 +271,7 @@ export class DexieStoreBackup implements DataStoreBackup {
                 amount,
                 scheduledId,
                 accountId,
+                incomeId,
               }) => ({
                 id,
                 type,
@@ -279,6 +282,7 @@ export class DexieStoreBackup implements DataStoreBackup {
                 amount,
                 scheduledId,
                 accountId,
+                incomeId,
               }),
             ),
           );

@@ -57,8 +57,17 @@ export class TransactionService {
   }
 
   async remove(id: number): Promise<void> {
+    const linkedIds = this._transactions()
+      .filter((transaction) => transaction.incomeId === id && transaction.id !== undefined)
+      .map((transaction) => transaction.id as number);
+    const ids = new Set<number>([id, ...linkedIds]);
+
     await this.repository.delete(id);
-    this._transactions.set(this._transactions().filter((transaction) => transaction.id !== id));
+    this._transactions.set(
+      this._transactions().filter(
+        (transaction) => transaction.id === undefined || !ids.has(transaction.id),
+      ),
+    );
   }
 
   async removeByAccountId(accountId: number): Promise<void> {
@@ -66,5 +75,13 @@ export class TransactionService {
     this._transactions.set(
       this._transactions().filter((transaction) => transaction.accountId !== accountId),
     );
+  }
+
+  savingsForIncome(incomeId: number): readonly Transaction[] {
+    return this._transactions().filter((transaction) => transaction.incomeId === incomeId);
+  }
+
+  savedAmountForIncome(incomeId: number): number {
+    return this.savingsForIncome(incomeId).reduce((sum, saving) => sum + saving.amount, 0);
   }
 }

@@ -152,6 +152,16 @@
               </span>
             </div>
             <div class="flex shrink-0 items-center gap-1">
+              @if (canAddSaving(event)) {
+                <button
+                  type="button"
+                  (click)="addSavings(event)"
+                  [tippy]="'movements.savings.add' | t"
+                  class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 transition hover:bg-amber-500/20 dark:text-amber-400"
+                >
+                  <app-icon name="saving" class="h-4 w-4" />
+                </button>
+              }
               @if (event.kind !== 'movement') {
                 <button
                   type="button"

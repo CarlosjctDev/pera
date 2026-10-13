@@ -1,8 +1,9 @@
-import { DestroyRef, Injectable, computed, effect, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { DataChangesService } from '@app/core/realtime/data-changes.service';
 import { CONTACT_REPOSITORY } from '@app/features/master-data/data-access/contact.repository';
+import { SELF_CONTACT_ID } from '@app/features/master-data/models/contact.model';
 import { ProfileService } from '@app/features/profile/services/profile.service';
 
 import type { Contact, NewContact } from '@app/features/master-data/models/contact.model';
@@ -18,28 +19,32 @@ export class ContactService {
 
   private readonly _contacts = signal<readonly Contact[]>([]);
   private readonly _loading = signal(true);
-  private selfSync: Promise<void> = Promise.resolve();
 
-  readonly contacts = this._contacts.asReadonly();
   readonly loading = this._loading.asReadonly();
-  readonly selfContact = computed(() => this._contacts().find((contact) => contact.isSelf === true));
+  readonly selfContact = computed<Contact | undefined>(() => {
+    const name = this.profile.name().trim();
+
+    if (!this.profile.completed() || name === '') {
+      return undefined;
+    }
+
+    return { id: SELF_CONTACT_ID, name, kind: 'person', gender: null, isSelf: true };
+  });
+
+  readonly contacts = computed<readonly Contact[]>(() => {
+    const self = this.selfContact();
+
+    return self === undefined ? this._contacts() : [...this._contacts(), self];
+  });
 
   constructor() {
     this.dataChanges.changed$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => void this.reload());
-
-    effect(() => {
-      const completed = this.profile.completed();
-      const name = this.profile.name().trim();
-
-      this.scheduleSelfSync(completed, name);
-    });
   }
 
   async load(): Promise<void> {
     await this.reload();
-    await this.scheduleSelfSync(this.profile.completed(), this.profile.name().trim());
     this._loading.set(false);
   }
 
@@ -48,31 +53,6 @@ export class ContactService {
       this._contacts.set(await this.repository.list());
     } catch {
       /* keep previous data */
-    }
-  }
-
-  private scheduleSelfSync(completed: boolean, name: string): Promise<void> {
-    this.selfSync = this.selfSync
-      .then(() => this.applySelfContact(completed, name))
-      .catch(() => undefined);
-
-    return this.selfSync;
-  }
-
-  private async applySelfContact(completed: boolean, name: string): Promise<void> {
-    if (!completed || name === '') {
-      return;
-    }
-
-    const current = this.selfContact();
-
-    if (current === undefined) {
-      await this.create({ name, kind: 'person', gender: null, isSelf: true });
-      return;
-    }
-
-    if (current.name !== name && current.id !== undefined) {
-      await this.update({ ...current, name });
     }
   }
 

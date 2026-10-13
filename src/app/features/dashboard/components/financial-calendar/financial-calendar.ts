@@ -19,6 +19,8 @@ import { I18nCurrency } from '@app/core/i18n/pipes/currency.pipe';
 import { I18nDate } from '@app/core/i18n/pipes/date.pipe';
 import { T } from '@app/core/i18n/pipes/t.pipe';
 import { TippyDirective } from '@app/core/directives/tippy.directive';
+import { normalizeText } from '@app/core/utils/text.utils';
+import { SELF_CONTACT_ID } from '@app/features/master-data/models/contact.model';
 import { AttachmentListDialogComponent } from '@app/features/attachments/components/attachment-list-dialog/attachment-list-dialog';
 import { AttachmentService } from '@app/features/attachments/services/attachment.service';
 import { NoteDialogComponent } from '@app/features/notes/components/note-dialog/note-dialog';
@@ -28,6 +30,7 @@ import { ProfileService } from '@app/features/profile/services/profile.service';
 import { AccountService } from '@app/features/transactions/services/account.service';
 import { CategoryService } from '@app/features/transactions/services/category.service';
 import { TransactionService } from '@app/features/transactions/services/transaction.service';
+import { SavingsDialogComponent } from '@app/features/transactions/components/savings-dialog/savings-dialog';
 import { TRANSACTION_TYPE_COLORS } from '@app/features/transactions/models/transaction-type.model';
 import { parseIsoDate } from '@app/features/transactions/utils/recurrence.utils';
 
@@ -42,6 +45,8 @@ import {
 
 import type { EventDetailData } from '../event-detail-dialog/event-detail-dialog';
 import type { CalendarEvent } from '../../models/calendar-event.model';
+import type { SavingsDialogData } from '@app/features/transactions/components/savings-dialog/savings-dialog';
+import type { SavingDraft } from '@app/features/transactions/models/saving-draft.model';
 import type { Account } from '@app/features/transactions/models/account.model';
 import type { TransactionType } from '@app/features/transactions/models/transaction-type.model';
 
@@ -347,6 +352,7 @@ export class FinancialCalendar implements OnInit {
               ? undefined
               : this.contactNames().get(transaction.contactId),
           scheduled: transaction.scheduledId !== undefined,
+          incomeId: transaction.type === 'income' ? transaction.id : undefined,
         } satisfies EventDetailData,
       });
 
@@ -384,6 +390,60 @@ export class FinancialCalendar implements OnInit {
     } catch {
       this.toastr.error('toasts.saveError');
     }
+  }
+
+  protected canAddSaving(event: CalendarEvent): boolean {
+    return (
+      event.kind === 'movement' &&
+      event.transactionType === 'income' &&
+      event.ownerId !== undefined
+    );
+  }
+
+  protected addSavings(event: CalendarEvent): void {
+    if (!this.canAddSaving(event) || event.ownerId === undefined) {
+      return;
+    }
+
+    const transaction = this.transactionService
+      .transactions()
+      .find((item) => item.id === event.ownerId);
+
+    if (transaction === undefined || transaction.id === undefined) {
+      return;
+    }
+
+    const saved = this.transactionService.savedAmountForIncome(transaction.id);
+    const max = Math.max(0, Math.round((transaction.amount - saved) * 100) / 100);
+
+    const dialogRef = this.dialog.open<readonly SavingDraft[] | undefined>(
+      SavingsDialogComponent,
+      { data: { max } satisfies SavingsDialogData },
+    );
+
+    dialogRef.closed.subscribe(async (drafts) => {
+      if (drafts === undefined || drafts.length === 0 || transaction.id === undefined) {
+        return;
+      }
+
+      try {
+        for (const draft of drafts) {
+          await this.transactionService.add({
+            type: 'saving',
+            categoryId: draft.categoryId as number,
+            contactId: SELF_CONTACT_ID,
+            date: transaction.date,
+            concept: normalizeText(draft.concept),
+            amount: Math.round((draft.amount as number) * 100) / 100,
+            incomeId: transaction.id,
+          });
+        }
+
+        this.toastr.success('toasts.saved');
+      } catch {
+        this.toastr.error('toasts.saveError');
+      }
+    });
   }
 
   protected markerClass(event: CalendarEvent): string {

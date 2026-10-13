@@ -246,6 +246,18 @@
       "expense": "Añadir gasto",
       "saving": "Añadir ahorro"
     },
+    "savings": {
+      "title": "Ahorros",
+      "hint": "Aparta parte de este ingreso como ahorro. El total no puede superar el importe del ingreso.",
+      "add": "Agregar ahorro",
+      "addTitle": "Añadir ahorros al ingreso",
+      "item": "Ahorro",
+      "remove": "Quitar ahorro",
+      "empty": "Aún no hay ahorros",
+      "total": "Total ahorrado",
+      "remaining": "Disponible",
+      "exceeds": "El ahorro no puede superar el importe del ingreso."
+    },
     "list": "Movimientos",
     "empty": "Aún no hay movimientos",
     "errors": {
@@ -469,6 +481,7 @@
         "invalidCreatedAt": "{{ table }}[{{ index }}]: fecha de creación inválida",
         "missingCategoryReference": "{{ table }}[{{ index }}]: la categoría referenciada ({{ id }}) no existe",
         "missingContactReference": "{{ table }}[{{ index }}]: el contacto referenciado ({{ id }}) no existe",
+        "missingIncomeReference": "{{ table }}[{{ index }}]: el ingreso referenciado ({{ id }}) no existe",
         "missingRelationshipReference": "{{ table }}[{{ index }}]: el tipo de relación referenciado ({{ id }}) no existe",
         "invalidOwnerType": "{{ table }}[{{ index }}]: tipo de propietario inválido",
         "invalidOwnerId": "{{ table }}[{{ index }}]: propietario inválido",
