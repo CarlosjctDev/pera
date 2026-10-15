@@ -9,12 +9,13 @@ import {
   provideBrowserGlobalErrorListeners,
   isDevMode,
 } from '@angular/core';
-import { TitleStrategy, provideRouter } from '@angular/router';
+import { TitleStrategy, provideRouter, withHashLocation } from '@angular/router';
 
 import { routes } from './app.routes';
 import { PERSISTENCE_PROVIDERS } from './adapters/persistence/persistence.providers';
 import { I18nService } from './core/i18n/i18n.service';
 import { I18nTitleStrategy } from './core/i18n/i18n-title.strategy';
+import { IS_ELECTRON } from './core/platform/platform';
 import { ProfileService } from './features/profile/services/profile.service';
 import { ScheduledMovementService } from './features/transactions/services/scheduled-movement.service';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -25,14 +26,14 @@ registerLocaleData(localeEs);
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
+    provideRouter(routes, ...(IS_ELECTRON ? [withHashLocation()] : [])),
     { provide: TitleStrategy, useClass: I18nTitleStrategy },
     { provide: LOCALE_ID, useFactory: () => inject(I18nService).language() },
     provideAppInitializer(() => inject(ProfileService).load()),
     provideAppInitializer(() => inject(ScheduledMovementService).generateDue()),
     ...PERSISTENCE_PROVIDERS,
     provideServiceWorker('ngsw-worker.js', {
-      enabled: !isDevMode(),
+      enabled: !isDevMode() && !IS_ELECTRON,
       registrationStrategy: 'registerWhenStable:30000',
     }),
   ],
